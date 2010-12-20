@@ -1,16 +1,7 @@
 
-local LibAuraInfo = LibStub('LibAuraInfo-1.0')
-LibAuraInfo.auraInfo[28271] = '50;1'
-LibAuraInfo.auraInfo[28272] = '50;1'
-LibAuraInfo.auraInfo[61305] = '50;1'
-LibAuraInfo.auraInfoPvP[28271] = 10
-LibAuraInfo.auraInfoPvP[28272] = 10
-LibAuraInfo.auraInfoPvP[61305] = 10
-
 local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
-
-
 SheepMonitor = DongleStub('Dongle-1.2'):New('SheepMonitor')
+
 function SheepMonitor:Initialize()
 	self.db = self:InitializeDB('SheepMonitorDatabase', {
 		char = {
@@ -37,17 +28,27 @@ end
 
 
 local polymorphAuras = {
-	[118] = 'Interface\\Icons\\Spell_Nature_Polymorph',         -- sheep
-	[28271] = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',    -- turtle
-	[28272] = 'Interface\\Icons\\Spell_Magic_PolymorphPig',     -- pig
-	[61305] = 'Interface\\Icons\\Achievement_Halloween_Cat_01', -- cat
-	[61721] = 'Interface\\Icons\\Spell_Magic_PolymorphRabbit',  -- rabbit
-	[51514] = 'Interface\\Icons\\Spell_Shaman_Hex',             -- hex
-	[76780] = 'Interface\\Icons\\Spell_Shaman_BindElemental',   -- bind elemental
-	[9484] = 'Interface\\Icons\\Spell_Nature_Slow',             -- shackle undead
-	[2637] = 'Interface\\Icons\\Spell_Nature_Sleep',            -- hibernate
-	[6770] = 'Interface\\Icons\\Ability_Sap',                   -- sap
-	[3355] = 'Interface\\Icons\\Spell_Frost_ChainsOfIce',       -- freezing trap (1499,60192)
+	[118] = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- sheep
+	[28271] = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',      -- turtle
+	[28272] = 'Interface\\Icons\\Spell_Magic_PolymorphPig',       -- pig
+	[61305] = 'Interface\\Icons\\Achievement_Halloween_Cat_01',   -- cat
+	[61721] = 'Interface\\Icons\\Spell_Magic_PolymorphRabbit',    -- rabbit
+	[51514] = 'Interface\\Icons\\Spell_Shaman_Hex',               -- hex
+	[76780] = 'Interface\\Icons\\Spell_Shaman_BindElemental',     -- bind elemental
+	[9484] = 'Interface\\Icons\\Spell_Nature_Slow',               -- shackle undead
+	[8122] = 'Interface\\Icons\\Spell_Shadow_PsychicScream',      -- psychic scream
+	[2637] = 'Interface\\Icons\\Spell_Nature_Sleep',              -- hibernate
+	[6770] = 'Interface\\Icons\\Ability_Sap',                     -- sap
+	[3355] = 'Interface\\Icons\\Spell_Frost_ChainsOfIce',         -- freezing trap: 1499/60192
+	[19386] = 'Interface\\Icons\\Inv_Spear_02',                   -- wyvern sting
+	[710] = 'Interface\\Icons\\Spell_Shadow_Cripple',             -- banish
+	[5782] = 'Interface\\Icons\\Spell_Shadow_Possession',         -- fear
+	[6358] = 'Interface\\Icons\\Spell_Shadow_MindSteal',          -- seduction
+	[20066] = 'Interface\\Icons\\Spell_Holy_PrayerOfHealing',     -- repentance
+	[10326] = 'Interface\\Icons\\Spell_Holy_TurnUndead',          -- turn evil
+	[1098] = 'Interface\\Icons\\Spell_Shadow_EnslaveDemon',       -- enslave demon
+	[605] = 'Interface\\Icons\\Spell_Shadow_ShadowWordDominate',  -- mind control
+	[339] = 'Interface\\Icons\\Spell_Nature_StrangleVines',       -- entangling roots
 }
 local damageEventTypes = {
 	['SWING_DAMAGE'] = true,
@@ -59,6 +60,15 @@ local damageEventTypes = {
 	['DAMAGE_SPLIT'] = true,
 	['DAMAGE_SHIELD'] = true,
 }
+
+local LibAuraInfo = LibStub('LibAuraInfo-1.0')
+LibAuraInfo.auraInfo[3355] = '60;1' -- fixing incorrect value
+LibAuraInfo.auraInfo[28271] = '50;1'
+LibAuraInfo.auraInfo[28272] = '50;1'
+LibAuraInfo.auraInfo[61305] = '50;1'
+LibAuraInfo.auraInfoPvP[28271] = 10
+LibAuraInfo.auraInfoPvP[28272] = 10
+LibAuraInfo.auraInfoPvP[61305] = 10
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellId, spellName, spellSchool = select(1, ...)
