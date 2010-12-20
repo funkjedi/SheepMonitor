@@ -1,8 +1,8 @@
-## Interface: 40000
+## Interface: 40100
 ## Title: Sheep Monitor
 ## Notes: Provides various methods of notification to help you keep track of your flock.
 ## Author: funkjedi
-## Version: 1.4
+## Version: 1.5
 ## SavedVariables: SheepMonitorDatabase
 
 embeds.xml
