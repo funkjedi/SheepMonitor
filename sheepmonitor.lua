@@ -46,7 +46,8 @@ local polymorphAuras = {
 	[76780] = 'Interface\\Icons\\Spell_Shaman_BindElemental',   -- bind elemental
 	[9484] = 'Interface\\Icons\\Spell_Nature_Slow',             -- shackle undead
 	[2637] = 'Interface\\Icons\\Spell_Nature_Sleep',            -- hibernate
-	[6770] = 'Interface\\Icons\\Ability_Sap', -- sap
+	[6770] = 'Interface\\Icons\\Ability_Sap',                   -- sap
+	[3355] = 'Interface\\Icons\\Spell_Frost_ChainsOfIce',       -- freezing trap (1499,60192)
 }
 local damageEventTypes = {
 	['SWING_DAMAGE'] = true,
