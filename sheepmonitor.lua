@@ -18,6 +18,7 @@ function SheepMonitor:Initialize()
 			enableRaid = true,
 			enableChat = false,
 			enableParty = false,
+			enablePolymorphMessages = false,
 			enableBreakMessages = true,
 			enableBreakWarningMessages = true,
 			enableAudibleBreak = true,
@@ -45,6 +46,7 @@ local polymorphAuras = {
 	[76780] = 'Interface\\Icons\\Spell_Shaman_BindElemental',   -- bind elemental
 	[9484] = 'Interface\\Icons\\Spell_Nature_Slow',             -- shackle undead
 	[2637] = 'Interface\\Icons\\Spell_Nature_Sleep',            -- hibernate
+	[6770] = 'Interface\\Icons\\Ability_Sap', -- sap
 }
 local damageEventTypes = {
 	['SWING_DAMAGE'] = true,
@@ -74,7 +76,6 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				self.polymorph.duration = select(6, UnitAura('target', spellName, nil, 'PLAYER|HARMFUL'))
 			else
 				-- if target was switch before the cast was completed use LibAuraInfo to get a best guess for duration
-				-- NOTE: LibAuraInfo doesn't account for the duration variance of the different spell levels
 				self.polymorph.duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID)
 			end
 			self:POLYMORPH_APPLIED()
@@ -108,8 +109,8 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				if self.polymorph.auraRemoved then
 					SheepMonitor.polymorph = nil
 				else
-					-- in this case another polymorph has been cast before
-					-- our watcher code caught who broke
+					-- another polymorph has been cast before our watcher code caught who broke
+					-- our polymorph this is likely the result of the mob being re-sheeped
 					SheepMonitor:POLYMORPH_APPLIED()
 				end
 			end, 0.1)
@@ -128,7 +129,19 @@ function SheepMonitor:POLYMORPH_APPLIED()
 		self:ShowOmniCC()
 	end
 	if self.db.char.enableQuartz then
-		SheepMonitor:ShowQuartz()
+		self:ShowQuartz()
+	end
+	if self.db.char.enablePolymorphMessages then
+		local message = L['WARNING_APPLIED']:format(self.polymorph.spellName, self.polymorph.destName)
+		if self.db.char.enableRaid then
+			self:ShowRaidWarning(message)
+		end
+		if self.db.char.enableChat then
+			print(message)
+		end
+		if self.db.char.enableParty then
+			self:SendAnnouncement(message)
+		end
 	end
 end
 
@@ -139,11 +152,13 @@ function SheepMonitor:POLYMORPH_UPDATE()
 	if self.db.char.enableBreakWarningMessages and self.polymorph.remaining < 6 then
 		local message = L['WARNING_BREAK_INCOMING']:format(self.polymorph.spellName, self.polymorph.remaining)
 		if self.db.char.enableRaid then
-			RaidBossEmoteFrame.slot1:Hide()
-			RaidNotice_AddMessage(RaidBossEmoteFrame, message, ChatTypeInfo["BATTLEGROUND_LEADER"])
+			self:ShowRaidWarning(message, ChatTypeInfo["BATTLEGROUND_LEADER"])
 		end
 		if self.db.char.enableChat then
 			print(message)
+		end
+		if self.db.char.enableParty then
+			self:SendAnnouncement(message)
 		end
 	end
 	if self.db.char.enableAudibleBreakWarning and self.polymorph.remaining == 5 then
@@ -170,29 +185,19 @@ function SheepMonitor:POLYMORPH_REMOVED()
 	if self.db.char.enableAudibleBreak then
 		PlaySoundFile(self.db.char.audibleBreakSound)
 	end
-
-	local message = L['WARNING_BROKEN']:format(self.polymorph.spellName)
-	if self.polymorph.breakerName then
-		message = L['WARNING_BROKEN_BY']:format(self.polymorph.spellName, self.polymorph.breakerName, self.polymorph.breakerReason)
-	end
-	if self.db.char.enableRaid then
-		RaidBossEmoteFrame.slot1:Hide()
-		RaidNotice_AddMessage(RaidBossEmoteFrame, message, ChatTypeInfo["RAID_BOSS_EMOTE"])
-	end
-	if self.db.char.enableChat then
-		print(message)
-	end
-	if self.db.char.enableParty then
-		local chatType = false
-		if GetRealNumRaidMembers() > 0 then
-			chatType = "RAID"
-		elseif GetNumRaidMembers() > 0 then
-			chatType = "BATTLEGROUND"
-		elseif GetNumPartyMembers() > 0 then
-			chatType = "PARTY"
+	if self.db.char.enableBreakMessages then
+		local message = L['WARNING_BROKEN']:format(self.polymorph.spellName)
+		if self.polymorph.breakerName then
+			message = L['WARNING_BROKEN_BY']:format(self.polymorph.spellName, self.polymorph.breakerName, self.polymorph.breakerReason)
 		end
-		if chatType then
-			SendChatMessage(message, chatType)
+		if self.db.char.enableRaid then
+			self:ShowRaidWarning(message)
+		end
+		if self.db.char.enableChat then
+			print(message)
+		end
+		if self.db.char.enableParty then
+			self:SendAnnouncement(message)
 		end
 	end
 end

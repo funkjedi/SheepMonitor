@@ -67,14 +67,13 @@ function SheepMonitor:CreateInterfaceOptions()
 
 
 	local raidheader = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-	raidheader:SetText('Warning Messages')
-	raidheader:SetPoint('TOPLEFT', enableQuartz.frame, 'BOTTOMLEFT', 0, -30)
+	raidheader:SetText(L['WARNINGS_HEADER'])
+	raidheader:SetPoint('TOPLEFT', enableQuartz.frame, 'BOTTOMLEFT', 0, -20)
 
 	local enableRaid = wf.factory('CheckBox', {
 		key = 'enableRaid',
 		parent = frame,
 		label = L['ENABLE_RAID'],
-		tooltip = L['ENABLE_RAID_TOOLTIP'],
 		width = 400,
 		get = getOption,
 		set = setOption
@@ -95,11 +94,24 @@ function SheepMonitor:CreateInterfaceOptions()
 		key = 'enableParty',
 		parent = frame,
 		label = L['ENABLE_PARTY'],
+		tooltip = L['ENABLE_PARTY_TOOLTIP'],
 		width = 400,
 		get = getOption,
 		set = setOption
 	})
 	enableParty.frame:SetPoint('TOPLEFT', enableChat.frame, 'BOTTOMLEFT', 0, 4)
+
+
+	local enablePolymorphMessages = wf.factory('CheckBox', {
+		key = 'enablePolymorphMessages',
+		parent = frame,
+		label = L['ENABLE_POLYMORPH_MESSAGES'],
+		width = 400,
+		fontSize = 'small',
+		get = getOption,
+		set = setOption
+	})
+	enablePolymorphMessages.frame:SetPoint('TOPLEFT', enableParty.frame, 'BOTTOMLEFT', 20, 0)
 
 	local enableBreakMessages = wf.factory('CheckBox', {
 		key = 'enableBreakMessages',
@@ -110,7 +122,7 @@ function SheepMonitor:CreateInterfaceOptions()
 		get = getOption,
 		set = setOption
 	})
-	enableBreakMessages.frame:SetPoint('TOPLEFT', enableParty.frame, 'BOTTOMLEFT', 20, 0)
+	enableBreakMessages.frame:SetPoint('TOPLEFT', enablePolymorphMessages.frame, 'BOTTOMLEFT', 0, 6)
 
 	local enableBreakWarningMessages = wf.factory('CheckBox', {
 		key = 'enableBreakWarningMessages',
@@ -151,7 +163,7 @@ function SheepMonitor:CreateInterfaceOptions()
 		get = getOption,
 		set = setOption
 	})
-	enableAudibleBreak.frame:SetPoint('TOPLEFT', enableBreakWarningMessages.frame, 'BOTTOMLEFT', -20, -16)
+	enableAudibleBreak.frame:SetPoint('TOPLEFT', enableBreakWarningMessages.frame, 'BOTTOMLEFT', -20, -20)
 
 	local audibleBreakSound = wf.factory('Dropdown', {
 		key = 'audibleBreakSound',

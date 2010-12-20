@@ -97,3 +97,23 @@ function SheepMonitor:UpdateNotifierStatusBar()
 	self.notifier.statusBar:SetValue(self.polymorph.remainingRaw)
 end
 
+
+function SheepMonitor:ShowRaidWarning(message, color)
+	RaidBossEmoteFrame.slot1:Hide()
+	RaidNotice_AddMessage(RaidBossEmoteFrame, message, color or ChatTypeInfo["RAID_BOSS_EMOTE"])
+end
+
+function SheepMonitor:SendAnnouncement(message)
+	local chatType = false
+	if GetRealNumRaidMembers() > 0 then
+		chatType = "RAID"
+	elseif GetNumRaidMembers() > 0 then
+		chatType = "BATTLEGROUND"
+	elseif GetNumPartyMembers() > 0 then
+		chatType = "PARTY"
+	end
+	if chatType then
+		SendChatMessage(message, chatType)
+	end
+end
+
