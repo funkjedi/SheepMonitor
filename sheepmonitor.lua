@@ -25,6 +25,7 @@ function SheepMonitor:Initialize()
 			enableAudibleBreakWarning = false,
 			audibleBreakWarningSound = 'Sound\\Interface\\RaidWarning.wav',
 			enableOmniCC = false,
+			enableQuartz = false,
 		}
 	})
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
@@ -78,7 +79,7 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			end
 			self:POLYMORPH_APPLIED()
 			self:ScheduleRepeatingTimer('SHEEPMONITOR_TIMER', function()
-				SheepMonitor.polymorph.remaining = SheepMonitor.polymorph.duration - floor(GetTime() - SheepMonitor.polymorph.timestamp)
+				SheepMonitor.polymorph.remaining = ceil(SheepMonitor.polymorph.duration - (GetTime() - SheepMonitor.polymorph.timestamp))
 				if SheepMonitor.polymorph.remaining > 0 then
 					SheepMonitor:POLYMORPH_UPDATE()
 				end
@@ -104,7 +105,13 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 			-- delay clearing up the polymorph so we can check who broken our sheep
 			self:ScheduleTimer('SHEEPMONITOR_BREAKER_WATCH', function()
 				SheepMonitor:POLYMORPH_REMOVED()
-				SheepMonitor.polymorph = nil
+				if self.polymorph.auraRemoved then
+					SheepMonitor.polymorph = nil
+				else
+					-- in this case another polymorph has been cast before
+					-- our watcher code caught who broke
+					SheepMonitor:POLYMORPH_APPLIED()
+				end
 			end, 0.1)
 			self:CancelTimer('SHEEPMONITOR_TIMER')
 			self:CancelTimer('SHEEPMONITOR_PRECISE_TIMER')
@@ -119,6 +126,9 @@ function SheepMonitor:POLYMORPH_APPLIED()
 	end
 	if self.db.char.enableOmniCC then
 		self:ShowOmniCC()
+	end
+	if self.db.char.enableQuartz then
+		SheepMonitor:ShowQuartz()
 	end
 end
 
@@ -154,6 +164,9 @@ function SheepMonitor:POLYMORPH_REMOVED()
 	if self.db.char.enableOmniCC then
 		self:HideOmniCC()
 	end
+	if self.db.char.enableQuartz then
+		self:HideQuartz()
+	end
 	if self.db.char.enableAudibleBreak then
 		PlaySoundFile(self.db.char.audibleBreakSound)
 	end
@@ -188,11 +201,11 @@ function SheepMonitor:PLAYER_ENTERING_WORLD()
 	if self.db.char.enableNotifier then
 		self:HideNotifier()
 	end
-	if self.db.char.enableOmniCC then
-		self:HideOmniCC()
-	end
 	self:CancelTimer('SHEEPMONITOR_TIMER')
 	self:CancelTimer('SHEEPMONITOR_PRECISE_TIMER')
 	self.polymorph = nil
 end
+
+
+
 

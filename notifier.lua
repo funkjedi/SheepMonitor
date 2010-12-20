@@ -1,14 +1,18 @@
 
 function SheepMonitor:ShowNotifier()
 	if not self.notifier then
-		self.notifier = CreateFrame('Frame', nil, UIParent)
+		self.notifier = CreateFrame('Frame', 'SheepMonitorVisualNotifier', UIParent)
 		self.notifier:Hide()
-		self.notifier:SetClampedToScreen(true)
 		self.notifier:EnableMouse(true)
 		self.notifier:SetMovable(true)
+		self.notifier:SetClampedToScreen(true)
 		self.notifier:SetWidth(140)
 		self.notifier:SetHeight(30)
-		self.notifier:SetPoint('CENTER')
+		if SheepMonitor.db.char.notifierFramePosition then
+			self.notifier:SetPoint(unpack(SheepMonitor.db.char.notifierFramePosition))
+		else
+			self.notifier:SetPoint('CENTER')
+		end
 		self.notifier:SetBackdrop({
 			bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',  
 			edgeFile = 'Interface\\Tooltips\\UI-DialogBox-Border',
@@ -53,9 +57,10 @@ function SheepMonitor:ShowNotifier()
 		self.notifier.statusBar:SetStatusBarColor(1, 0, 0)
 		-- enable our notifier to be dragged around
 		self.notifier:RegisterForDrag('RightButton')
-		self.notifier:SetScript('OnDragStop', function(self) self:StopMovingOrSizing() end)
-		self.notifier:SetScript('OnDragStart', function(self)
-			self:StartMoving()
+		self.notifier:SetScript('OnDragStart', function(self, button) self:StartMoving() end)
+		self.notifier:SetScript('OnDragStop', function(self, button)
+			self:StopMovingOrSizing() -- save our new position
+			SheepMonitor.db.char.notifierFramePosition = { self:GetPoint() }
 		end)
 	end
 	-- update and show the notifier

@@ -5,6 +5,7 @@ L['DESCRIPTION'] = 'SheepMonitor provides various methods of notification to hel
 
 L['ENABLE_NOTIFIER'] = 'Enable visual notifier'
 L['ENABLE_OMNICC'] = 'Enable OmniCC integration (experimental)'
+L['ENABLE_QUARTZ'] = 'Enable Quartz integration'
 L['ENABLE_RAID'] = 'Enable raid-style warnings'
 L['ENABLE_RAID_TOOLTIP'] = 'NO ACTUAL RAID WARNINGS ARE SENT TO ANYONE OTHER THAN YOU'
 L['ENABLE_CHAT'] = 'Enable chat message warnings'
