@@ -63,12 +63,6 @@ local damageEventTypes = {
 
 local LibAuraInfo = LibStub('LibAuraInfo-1.0')
 LibAuraInfo.auraInfo[3355] = '60;1' -- fixing incorrect value
-LibAuraInfo.auraInfo[28271] = '50;1'
-LibAuraInfo.auraInfo[28272] = '50;1'
-LibAuraInfo.auraInfo[61305] = '50;1'
-LibAuraInfo.auraInfoPvP[28271] = 10
-LibAuraInfo.auraInfoPvP[28272] = 10
-LibAuraInfo.auraInfoPvP[61305] = 10
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = select(1, ...)

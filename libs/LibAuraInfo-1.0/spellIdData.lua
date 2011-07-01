@@ -7,7 +7,7 @@
 local lib = LibStub("LibAuraInfo-1.0");
 if(not lib) then error("spellIdData.lua needs LibAuraInfo loaded."); return; end
 
-local myDataVersion = 1289975711;
+local myDataVersion = 1303970412;
 if(lib.auraInfo and myDataVersion <= lib.spellIdDataVersion) then return; end
 lib.spellIdDataVersion = myDataVersion;
 
@@ -47,7 +47,7 @@ lib.auraInfo = {
 	[1459]	= '3600;0',	-- Arcane Brilliance
 	[1513]	= '20;1',	-- Scare Beast
 	[1539]	= '10;0',	-- Feed Pet
---~ 	[1543]	= '0;0',	-- Flare
+	[1543]	= '0;0',	-- Flare
 	[1604]	= '4;0',	-- Dazed
 	[1706]	= '120;1',	-- Levitate
 	[1715]	= '15;0',	-- Hamstring
@@ -1906,6 +1906,16 @@ lib.auraInfo = {
 	[79464]	= '15;1',	-- Demon Soul: Voidwalker
 	[81661]	= '15;0',	-- Evangelism
 	[81700]	= '18;1',	-- Archangel
+	[80325]	= '0;7',	-- Camouflage
+	[81301]	= '12;1',	-- Glyph of Spirit Tap
+	[87204]	= '3;1',	-- Sin and Punishment
+	[51701]	= '0;0',	-- Honor Among Thieves
+	[81021]	= '10;5',	-- Stampede
+	[81130]	= '30;0',	-- Scarlet Fever
+	[90806]	= '9;0',	-- Executioner
+	[28271]	= '50;1',	-- Polymorph (turtle)
+	[28272]	= '50;1',	-- Polymorph (pig)
+	[61305]	= '50;1',	-- Polymorph (cat)
 }
 
 
@@ -1918,6 +1928,9 @@ lib.auraInfoPvP = {
 	[3355]	= 10, 	-- Freezing Trap Effect
 	[61721] = 10, 	-- Polymorph (Rabbit)
 	[118]	= 10,	-- Polymorph
+	[28271]	= 10,	-- Polymorph (turtle)
+	[28272]	= 10,	-- Polymorph (pig)
+	[61305]	= 10,	-- Polymorph (cat)
 	[20066] = 6, 	-- Repentance
 	[10326] = 10, 	-- Turn Evil
 	[605]	= 10, 	-- Mind Control
@@ -1931,6 +1944,9 @@ lib.auraInfoPvP = {
 	[5782]	= 10,	-- Fear
 	[1130]	= 120,	-- Hunter's Mark
 	[1490]	= 120,	-- Curse of the Elements
+	[19386]	= 6,	-- Wyvern Sting
+	[9484]	= 10,	-- Shackle Undead
+
 }
 
 --[[

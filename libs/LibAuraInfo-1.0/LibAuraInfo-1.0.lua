@@ -8,7 +8,7 @@ Dependencies: LibStub
 ]]
 
 
-local MAJOR, MINOR = "LibAuraInfo-1.0", 10
+local MAJOR, MINOR = "LibAuraInfo-1.0", 15
 if not LibStub then error(MAJOR .. " requires LibStub.") return end
 
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
@@ -768,20 +768,32 @@ local function SaveGUIDInfo(guid, name, flags)
 end
 
 do 
-	local timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags
+	local tonumber = tonumber
+	local GetBuildInfo = GetBuildInfo
+	local select = select
+	
+	local timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags
+	local dstFlags2, srcFlags2 --4.2 
+	local eventVars=10
 	function lib.frame:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		--timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags
-		timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags  = ...-- ***
-	
+		
+		if tonumber((select(4, GetBuildInfo()))) >= 40200 then
+			timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, srcFlags2, dstGUID, dstName, dstFlags, dstFlags2 = ...
+			eventVars = 12
+		else
+			timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags  = ...-- ***
+		end
+		
 		if srcGUID and not lib.GUIDData_name[srcGUID] then
 			SaveGUIDInfo(srcGUID, srcName, srcFlags)
 		end
 		if dstGUID and not lib.GUIDData_name[dstGUID] then
 			SaveGUIDInfo(dstGUID, dstName, dstFlags)
 		end
-		
+
 		if self[eventType] then
-			self[eventType](self, eventType, ...)
+			self[eventType](self, eventType, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, select(eventVars, ...)) -- ...
 		elseif eventType:find("AURA") then
 			debugPrint("Missing eventType", eventType)
 		end
@@ -1078,7 +1090,7 @@ end
 
 do
 	local spellID, spellName, spellSchool, auraType
-	function lib.frame:SPELL_AURA_REMOVED(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)	--
+	function lib.frame:SPELL_AURA_REMOVED(event, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)	--
 		spellID, spellName, spellSchool, auraType  = ...
 		RemoveAuraFromGUID(dstGUID, spellID, srcGUID)
 	--~ 	debugPrint(event, dstName, spellName)
@@ -1096,7 +1108,7 @@ end
 
 do
 	local spellID, spellName, spellSchool, auraType, amount
-	function lib.frame:SPELL_AURA_APPLIED(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)	--
+	function lib.frame:SPELL_AURA_APPLIED(event, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)	--
 		spellID, spellName, spellSchool, auraType, amount  = ...
 
 		if lib.drSpells[spellID] then
@@ -1122,7 +1134,7 @@ end
 do
 	local spellID, spellName, spellSchool, auraType
 	local refreshed, expirationTime
-	function lib.frame:SPELL_AURA_REFRESH(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
+	function lib.frame:SPELL_AURA_REFRESH(event, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
 		spellID, spellName, spellSchool, auraType  = ...
 		
 		if lib.drSpells[spellID] then
@@ -1137,7 +1149,7 @@ do
 			return
 		end
 	
-		self:SPELL_AURA_APPLIED(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
+		self:SPELL_AURA_APPLIED(event, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
 	end
 end
 	
@@ -1145,7 +1157,7 @@ do
 	local spellID, spellName, spellSchool, auraType
 	local dosed, stackCount, expirationTime
 	--DOSE = spell stacking
-	function lib.frame:SPELL_AURA_APPLIED_DOSE(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
+	function lib.frame:SPELL_AURA_APPLIED_DOSE(event, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
 		spellID, spellName, spellSchool, auraType  = ...
 	
 		dosed, stackCount, expirationTime = lib:AddAuraDose(dstGUID, spellID, srcGUID)
@@ -1157,7 +1169,7 @@ do
 	
 		--Spell isn't in our list, let's add it.
 		--Note this event could have fired on the 5th stack but our spell frame will only show it applied once. 
-		self:SPELL_AURA_APPLIED(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
+		self:SPELL_AURA_APPLIED(event, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
 	end
 end
 
@@ -1165,7 +1177,7 @@ do
 	local spellID, spellName, spellSchool, auraType
 	local dosed, stackCount, expirationTime
 	--~ function lib.frame:SPELL_AURA_APPLIED_REMOVED_DOSE(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
-	function lib.frame:SPELL_AURA_REMOVED_DOSE(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
+	function lib.frame:SPELL_AURA_REMOVED_DOSE(event, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
 		spellID, spellName, spellSchool, auraType  = ...
 		dosed, stackCount, expirationTime = lib:RemoveAuraDose(dstGUID, spellID, srcGUID)
 		if dosed then
@@ -1186,7 +1198,7 @@ function lib.frame:SPELL_AURA_BROKEN(...)
 end
 
 
-function lib.frame:UNIT_DIED(event, timestamp, eventType, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
+function lib.frame:UNIT_DIED(event, timestamp, eventType, hideCaster, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, ...)
 	if lib.GUIDAuras[dstGUID] then
 		lib:RemoveAllAurasFromGUID(dstGUID)
 		lib.callbacks:Fire("LibAuraInfo_AURA_CLEAR", dstGUID)
