@@ -71,7 +71,7 @@ LibAuraInfo.auraInfoPvP[28272] = 10
 LibAuraInfo.auraInfoPvP[61305] = 10
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellId, spellName, spellSchool = select(1, ...)
+	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = select(1, ...)
 	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and sourceName == UnitName('player') then
 		if polymorphAuras[spellId] then
 			self.polymorph = {
