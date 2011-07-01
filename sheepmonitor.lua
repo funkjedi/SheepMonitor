@@ -1,9 +1,19 @@
 
 local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
-SheepMonitor = DongleStub('Dongle-1.2'):New('SheepMonitor')
 
-function SheepMonitor:Initialize()
-	self.db = self:InitializeDB('SheepMonitorDatabase', {
+local LibAuraInfo = LibStub('LibAuraInfo-1.0')
+LibAuraInfo.auraInfo[3355] = '90;1' -- fixing incorrect value
+LibAuraInfo.auraInfo[28271] = '50;1'
+LibAuraInfo.auraInfo[28272] = '50;1'
+LibAuraInfo.auraInfo[61305] = '50;1'
+LibAuraInfo.auraInfoPvP[28271] = 10
+LibAuraInfo.auraInfoPvP[28272] = 10
+LibAuraInfo.auraInfoPvP[61305] = 10
+
+
+SheepMonitor = LibStub('AceAddon-3.0'):NewAddon('SheepMonitor', 'AceEvent-3.0', 'AceTimer-3.0')
+function SheepMonitor:OnInitialize()
+	self.db = LibStub('AceDB-3.0'):New('SheepMonitorDatabase', {
 		char = {
 			enableNotifier = true,
 			enableRaid = true,
@@ -18,118 +28,67 @@ function SheepMonitor:Initialize()
 			audibleBreakWarningSound = 'Sound\\Interface\\RaidWarning.wav',
 			enableOmniCC = false,
 			enableQuartz = false,
+			growUpwards = false,
 		}
 	})
-	self:RegisterEvent('PLAYER_ENTERING_WORLD')
-	self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+
 	self:CreateInterfaceOptions()
 	--InterfaceOptionsFrame_OpenToCategory('SheepMonitor')
 end
 
+function SheepMonitor:OnEnable()
+	self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+end
 
-local polymorphAuras = {
-	[118] = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- sheep
-	[28271] = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',      -- turtle
-	[28272] = 'Interface\\Icons\\Spell_Magic_PolymorphPig',       -- pig
-	[61305] = 'Interface\\Icons\\Achievement_Halloween_Cat_01',   -- cat
-	[61721] = 'Interface\\Icons\\Spell_Magic_PolymorphRabbit',    -- rabbit
-	[51514] = 'Interface\\Icons\\Spell_Shaman_Hex',               -- hex
-	[76780] = 'Interface\\Icons\\Spell_Shaman_BindElemental',     -- bind elemental
-	[9484] = 'Interface\\Icons\\Spell_Nature_Slow',               -- shackle undead
-	[8122] = 'Interface\\Icons\\Spell_Shadow_PsychicScream',      -- psychic scream
-	[2637] = 'Interface\\Icons\\Spell_Nature_Sleep',              -- hibernate
-	[6770] = 'Interface\\Icons\\Ability_Sap',                     -- sap
-	[3355] = 'Interface\\Icons\\Spell_Frost_ChainsOfIce',         -- freezing trap: 1499/60192
-	[19386] = 'Interface\\Icons\\Inv_Spear_02',                   -- wyvern sting
-	[710] = 'Interface\\Icons\\Spell_Shadow_Cripple',             -- banish
-	[5782] = 'Interface\\Icons\\Spell_Shadow_Possession',         -- fear
-	[6358] = 'Interface\\Icons\\Spell_Shadow_MindSteal',          -- seduction
-	[20066] = 'Interface\\Icons\\Spell_Holy_PrayerOfHealing',     -- repentance
-	[10326] = 'Interface\\Icons\\Spell_Holy_TurnUndead',          -- turn evil
-	[1098] = 'Interface\\Icons\\Spell_Shadow_EnslaveDemon',       -- enslave demon
-	[605] = 'Interface\\Icons\\Spell_Shadow_ShadowWordDominate',  -- mind control
-	[339] = 'Interface\\Icons\\Spell_Nature_StrangleVines',       -- entangling roots
-}
-local damageEventTypes = {
-	['SWING_DAMAGE'] = true,
-	['RANGE_DAMAGE'] = true,
-	['SPELL_DAMAGE'] = true,
-	['SPELL_PERIODIC_DAMAGE'] = true,
-	['SPELL_BUILDING_DAMAGE'] = true,
-	['ENVIRONMENTAL_DAMAGE'] = true,
-	['DAMAGE_SPLIT'] = true,
-	['DAMAGE_SHIELD'] = true,
-}
-
-local LibAuraInfo = LibStub('LibAuraInfo-1.0')
-LibAuraInfo.auraInfo[3355] = '60;1' -- fixing incorrect value
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = select(1, ...)
+	-- watch for polymorphed mobs
 	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and sourceName == UnitName('player') then
-		if polymorphAuras[spellId] then
-			self.polymorph = {
+		if self.trackableAuras[spellId] then
+			local aura = {
+				auraGUID = spellId .. destGUID, -- a unique identifier for this aura occurance
+				sourceGUID = sourceGUID,
+				sourceName = sourceName,
 				destGUID = destGUID,
 				destName = destName,
 				spellId = spellId,
 				spellName = spellName,
-				texture = polymorphAuras[spellId],
+				texture = self.trackableAuras[spellId],
 				timestamp = GetTime(),
-				duration = 50,
+				duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID),
 			}
 			if destGUID == UnitGUID('target') then
-				self.polymorph.duration = select(6, UnitAura('target', spellName, nil, 'PLAYER|HARMFUL'))
-			else
-				-- if target was switch before the cast was completed use LibAuraInfo to get a best guess for duration
-				self.polymorph.duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID)
+				aura.duration = select(6, UnitAura('target', spellName, nil, 'PLAYER|HARMFUL'))
 			end
-			self:POLYMORPH_APPLIED()
-			self:ScheduleRepeatingTimer('SHEEPMONITOR_TIMER', function()
-				SheepMonitor.polymorph.remaining = ceil(SheepMonitor.polymorph.duration - (GetTime() - SheepMonitor.polymorph.timestamp))
-				if SheepMonitor.polymorph.remaining > 0 then
-					SheepMonitor:POLYMORPH_UPDATE()
-				end
-			end, 1)
-			self:ScheduleRepeatingTimer('SHEEPMONITOR_PRECISE_TIMER', function()
-				SheepMonitor.polymorph.remainingRaw = SheepMonitor.polymorph.duration - (GetTime() - SheepMonitor.polymorph.timestamp)
-				if SheepMonitor.polymorph.remainingRaw > 0 then
-					SheepMonitor:POLYMORPH_UPDATE_PRECISE()
-				end
-			end, 0.1)
+			self:AuraApplied(aura)
 		end
 	end
 	-- watch for damage on our polymorph and record whoever breaks
-	if damageEventTypes[eventType] and self.polymorph and self.polymorph.destGUID == destGUID then
-		if self.polymorph.auraRemoved and not self.polymorph.breakerName then
-			self.polymorph.breakerName = sourceName
-			self.polymorph.breakerReason = eventType == 'SWING_DAMAGE' and 'Melee' or spellName
-		end
+	local damageEventTypes = {
+		['SWING_DAMAGE'] = true,
+		['RANGE_DAMAGE'] = true,
+		['SPELL_DAMAGE'] = true,
+		['SPELL_PERIODIC_DAMAGE'] = true,
+		['SPELL_BUILDING_DAMAGE'] = true,
+		['ENVIRONMENTAL_DAMAGE'] = true,
+		['DAMAGE_SPLIT'] = true,
+		['DAMAGE_SHIELD'] = true,
+	}
+	if self.watchForBreakers and self.watchForBreakers > 0 and damageEventTypes[eventType] then
+		self:AuraBroken(destGUID, sourceName, eventType == 'SWING_DAMAGE' and 'Melee' or spellName)
 	end
 	-- watch for our polymorph to dissipate
 	if eventType == 'SPELL_AURA_REMOVED' then
-		if polymorphAuras[spellId] and self.polymorph and self.polymorph.destGUID == destGUID then
-			-- delay clearing up the polymorph so we can check who broken our sheep
-			self:ScheduleTimer('SHEEPMONITOR_BREAKER_WATCH', function()
-				SheepMonitor:POLYMORPH_REMOVED()
-				if self.polymorph.auraRemoved then
-					SheepMonitor.polymorph = nil
-				else
-					-- another polymorph has been cast before our watcher code caught who broke
-					-- our polymorph this is likely the result of the mob being re-sheeped
-					SheepMonitor:POLYMORPH_APPLIED()
-				end
-			end, 0.1)
-			self:CancelTimer('SHEEPMONITOR_TIMER')
-			self:CancelTimer('SHEEPMONITOR_PRECISE_TIMER')
-			self.polymorph.auraRemoved = true
+		if self.trackableAuras[spellId] then
+			self:AuraRemoved(destGUID, spellId)
 		end
 	end
 end
 
-function SheepMonitor:POLYMORPH_APPLIED()
-	if self.db.char.enableNotifier then
-		self:ShowNotifier()
-	end
+
+
+function SheepMonitor:POLYMORPH_APPLIED(aura)
 	if self.db.char.enableOmniCC then
 		self:ShowOmniCC()
 	end
@@ -137,7 +96,7 @@ function SheepMonitor:POLYMORPH_APPLIED()
 		self:ShowQuartz()
 	end
 	if self.db.char.enablePolymorphMessages then
-		local message = L['WARNING_APPLIED']:format(self.polymorph.spellName, self.polymorph.destName)
+		local message = L['WARNING_APPLIED']:format(aura.spellName, aura.destName)
 		if self.db.char.enableRaid then
 			self:ShowRaidWarning(message)
 		end
@@ -150,12 +109,9 @@ function SheepMonitor:POLYMORPH_APPLIED()
 	end
 end
 
-function SheepMonitor:POLYMORPH_UPDATE()
-	if self.db.char.enableNotifier then
-		self:UpdateNotifierCountdown()
-	end
-	if self.db.char.enableBreakWarningMessages and self.polymorph.remaining < 6 then
-		local message = L['WARNING_BREAK_INCOMING']:format(self.polymorph.spellName, self.polymorph.remaining)
+function SheepMonitor:POLYMORPH_UPDATE(aura, remaining)
+	if self.db.char.enableBreakWarningMessages and remaining < 6 then
+		local message = L['WARNING_BREAK_INCOMING']:format(aura.spellName, remaining)
 		if self.db.char.enableRaid then
 			self:ShowRaidWarning(message, ChatTypeInfo["BATTLEGROUND_LEADER"])
 		end
@@ -166,21 +122,12 @@ function SheepMonitor:POLYMORPH_UPDATE()
 			self:SendAnnouncement(message)
 		end
 	end
-	if self.db.char.enableAudibleBreakWarning and self.polymorph.remaining == 5 then
+	if self.db.char.enableAudibleBreakWarning and remaining == 5 then
 		PlaySoundFile(self.db.char.audibleBreakWarningSound)
 	end
 end
 
-function SheepMonitor:POLYMORPH_UPDATE_PRECISE()
-	if self.db.char.enableNotifier then
-		self:UpdateNotifierStatusBar()
-	end
-end
-
-function SheepMonitor:POLYMORPH_REMOVED()
-	if self.db.char.enableNotifier then
-		self:HideNotifier()
-	end
+function SheepMonitor:POLYMORPH_REMOVED(aura)
 	if self.db.char.enableOmniCC then
 		self:HideOmniCC()
 	end
@@ -191,9 +138,9 @@ function SheepMonitor:POLYMORPH_REMOVED()
 		PlaySoundFile(self.db.char.audibleBreakSound)
 	end
 	if self.db.char.enableBreakMessages then
-		local message = L['WARNING_BROKEN']:format(self.polymorph.spellName)
-		if self.polymorph.breakerName then
-			message = L['WARNING_BROKEN_BY']:format(self.polymorph.spellName, self.polymorph.breakerName, self.polymorph.breakerReason)
+		local message = L['WARNING_BROKEN']:format(aura.spellName)
+		if aura.breakerName then
+			message = L['WARNING_BROKEN_BY']:format(aura.spellName, aura.breakerName, aura.breakerReason)
 		end
 		if self.db.char.enableRaid then
 			self:ShowRaidWarning(message)
@@ -207,15 +154,26 @@ function SheepMonitor:POLYMORPH_REMOVED()
 	end
 end
 
-function SheepMonitor:PLAYER_ENTERING_WORLD()
-	if self.db.char.enableNotifier then
-		self:HideNotifier()
-	end
-	self:CancelTimer('SHEEPMONITOR_TIMER')
-	self:CancelTimer('SHEEPMONITOR_PRECISE_TIMER')
-	self.polymorph = nil
+
+
+function SheepMonitor:ShowRaidWarning(message, color)
+	RaidBossEmoteFrame.slot1:Hide()
+	RaidNotice_AddMessage(RaidBossEmoteFrame, message, color or ChatTypeInfo["RAID_BOSS_EMOTE"])
 end
 
+function SheepMonitor:SendAnnouncement(message)
+	local chatType = false
+	if GetRealNumRaidMembers() > 0 then
+		chatType = "RAID"
+	elseif GetNumRaidMembers() > 0 then
+		chatType = "BATTLEGROUND"
+	elseif GetNumPartyMembers() > 0 then
+		chatType = "PARTY"
+	end
+	if chatType then
+		SendChatMessage(message, chatType)
+	end
+end
 
 
 
