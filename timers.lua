@@ -15,9 +15,10 @@ end
 local function stopDragging(self, button)
 	if self.isMoving then
 		SheepMonitor.notifier:StopMovingOrSizing()
+		if self:IsVisible() then -- save our new position
+			SheepMonitor.db.char.notifierFramePosition = { self:GetParent():GetPoint() }
+		end
 		self.isMoving = false
-		-- save our new position
-		SheepMonitor.db.char.notifierFramePosition = { self:GetParent():GetPoint() }
 	end
 end
 
@@ -116,13 +117,14 @@ end
 
 function SheepMonitor.Timer:Stop()
 	self:CancelRepeatingTimers()
+	self:Hide()
 	self.aura = nil
 	self:UpdateTimers()
 end
 
 function SheepMonitor.Timer:GetRemaining(raw)
 	local remaining = self.aura.duration - (GetTime() - self.aura.timestamp)
-	return raw and remaining or ceil(remaining)
+	return raw and remaining or floor(remaining)
 end
 
 function SheepMonitor.Timer:ScheduleRepeatingTimers()
@@ -131,6 +133,7 @@ function SheepMonitor.Timer:ScheduleRepeatingTimers()
 		if remaining > 0 then
 			timer:OnFinished(remaining)
 		else
+			timer:OnFinished(0)
 			timer:Stop()
 		end
 	end
@@ -163,7 +166,6 @@ function SheepMonitor.Timer:OnUpdate(remaining)
 end
 
 function SheepMonitor.Timer:UpdateTimers()
-
 	local lastBar = SheepMonitor.notifier
 	local from, to = "BOTTOM", "TOP"
 
@@ -172,7 +174,6 @@ function SheepMonitor.Timer:UpdateTimers()
 		to = "BOTTOM"
 	end
 
-	local totalHeight = 0
 	for i = 1, #timers do
 		if timers[i].aura then
 			local origTo = to
@@ -181,7 +182,6 @@ function SheepMonitor.Timer:UpdateTimers()
 			end
 			timers[i]:ClearAllPoints()
 			timers[i]:Show()
-			totalHeight = totalHeight + timers[i]:GetHeight()
 			timers[i]:SetPoint(from.."LEFT",  lastBar, to.."LEFT",  0, 0)
 			timers[i]:SetPoint(from.."RIGHT", lastBar, to.."RIGHT", 0, 0)
 			lastBar = timers[i]
@@ -190,5 +190,25 @@ function SheepMonitor.Timer:UpdateTimers()
 			timers[i]:Hide()
 		end
 	end
+end
+
+
+
+-- FOR TESTING PURPOSES ONLY
+function SheepMonitor:CreateTestTimer(duration)
+
+	local destGUID = math.random(0,200);
+	self:NotifierAuraApplied({
+		auraGUID = 118 .. destGUID,
+		sourceGUID = 0,
+		sourceName = 'Player',
+		destGUID = destGUID,
+		destName = 'Target',
+		spellId = 118,
+		spellName = 'Polymorph',
+		texture = self.trackableAuras[118],
+		timestamp = GetTime(),
+		duration = duration or 30
+	})
 
 end
