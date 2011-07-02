@@ -23,7 +23,7 @@ local function stopDragging(self, button)
 end
 
 
-function SheepMonitor.Timer:New(parent)
+function SheepMonitor.Timer:New()
 	-- look for a timer which can be recycled
 	-- this is important since frames can't be deleted once created
 	for index, timer in ipairs(timers) do
@@ -32,7 +32,23 @@ function SheepMonitor.Timer:New(parent)
 		end
 	end
 
-	local timer = SheepMonitor.Timer:Bind(CreateFrame('Frame', nil, parent or UIParent))
+	-- create our notifier frame if it hasn't been created already
+	if not SheepMonitor.notifier then
+		SheepMonitor.notifier = CreateFrame('Frame', nil, UIParent)
+		if SheepMonitor.db.char.notifierFramePosition then
+			SheepMonitor.notifier:ClearAllPoints()
+			SheepMonitor.notifier:SetPoint(unpack(SheepMonitor.db.char.notifierFramePosition))
+		else
+			SheepMonitor.notifier:SetPoint('CENTER')
+		end
+		SheepMonitor.notifier:SetWidth(140)
+		SheepMonitor.notifier:SetHeight(28)
+		SheepMonitor.notifier:SetMovable(true)
+		SheepMonitor.notifier:SetClampedToScreen(true)
+	end
+
+	-- create a new timer
+	local timer = SheepMonitor.Timer:Bind(CreateFrame('Frame', nil, SheepMonitor.notifier))
 	timer:Hide()
 	timer:SetWidth(140)
 	timer:SetHeight(28)
@@ -196,19 +212,18 @@ end
 
 -- FOR TESTING PURPOSES ONLY
 function SheepMonitor:CreateTestTimer(duration)
-
-	local destGUID = math.random(0,200);
-	self:NotifierAuraApplied({
-		auraGUID = 118 .. destGUID,
+	local aura = {
+		auraGUID = 118 .. math.random(0,200),
 		sourceGUID = 0,
 		sourceName = 'Player',
-		destGUID = destGUID,
+		destGUID = 0,
 		destName = 'Target',
 		spellId = 118,
 		spellName = 'Polymorph',
 		texture = self.trackableAuras[118],
 		timestamp = GetTime(),
 		duration = duration or 30
-	})
-
+	}
+	aura.timer = SheepMonitor.Timer:Get(aura) or SheepMonitor.Timer:New()
+	aura.timer:Start(aura)
 end

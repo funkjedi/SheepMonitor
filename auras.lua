@@ -37,9 +37,10 @@ function SheepMonitor:AuraApplied(aura)
 	if index then
 		table.remove(self.auras, index)
 	end
-	table.insert(self.auras, aura)	
+	table.insert(self.auras, aura)
 	self:POLYMORPH_APPLIED(aura)
-	self:NotifierAuraApplied(aura)
+	aura.timer = SheepMonitor.Timer:Get(aura) or SheepMonitor.Timer:New()
+	aura.timer:Start(aura)
 end
 
 function SheepMonitor:AuraBroken(destGUID, breakerName, breakerReason)
@@ -64,7 +65,10 @@ function SheepMonitor:AuraRemoved(destGUID, spellId)
 			SheepMonitor.watchForBreakers = SheepMonitor.watchForBreakers - 1
 			table.remove(SheepMonitor.auras, index)
 			SheepMonitor:POLYMORPH_REMOVED(aura)
-			SheepMonitor:NotifierAuraRemoved(aura)
+			if aura.timer then
+				aura.timer:Stop()
+			end
+			SheepMonitor.Timer:UpdateTimers()
 		end, 0.1)
 	end
 end

@@ -11,6 +11,5 @@ localization\localization.zhTW.lua
 sheepmonitor.lua
 auras.lua
 timers.lua
-notifier.lua
 integrations.lua
 options.lua
