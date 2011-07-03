@@ -87,11 +87,11 @@ end
 --UNUSED
 --created for testing purposes
 
-function SheepMonitor:GetSpellInfo(spellId)
-	local name, rank, icon, powerCost, isFunnel, powerType, castingTime, minRange, maxRange = GetSpellInfo(spellId)
+function SheepMonitor:GetSpellInfo(spellId, FROM_SPELLBOOK)
+	local name, rank, icon, powerCost, isFunnel, powerType, castingTime, minRange, maxRange = FROM_SPELLBOOK and GetSpellInfo(spellId, BOOKTYPE_SPELL) or GetSpellInfo(spellId)
 	if name then
 		local spell = {
-			id = spellId,
+			id = FROM_SPELLBOOK and select(2, GetSpellBookItemInfo(name)) or spellId,
 			name = name,
 			rank = rank,
 			icon = icon,
@@ -101,9 +101,10 @@ function SheepMonitor:GetSpellInfo(spellId)
 			castingTime = castingTime,
 			minRange = minRange,
 			maxRange = maxRange,
-			texture = GetSpellTexture(name),
+			texture = FROM_SPELLBOOK and GetSpellTexture(spellId, BOOKTYPE_SPELL) or GetSpellTexture(name),
 			actionslots = {},
 			tooltips = {},
+			index = index,
 		}
 		-- retrieve the slot id for any actionbars the spell is in
 		for i = 1, 120 do
@@ -131,4 +132,21 @@ function SheepMonitor:GetSpellInfo(spellId)
 	end
 end
 
+function SheepMonitor:CacheSpellbook()
+	self.spellbook = {}
+	for i = 1, MAX_SPELLS do
+		local spell = self:GetSpellInfo(i, true)
+		if spell then
+			table.insert(self.spellbook, spell)
+		end
+	end
+end
 
+function SheepMonitor:GetSpellInfoByName(name)
+	self:CacheSpellBook()
+	for _, spell in ipairs(self.spellbook) do
+		if spell.name == name then
+			return spell
+		end
+	end
+end

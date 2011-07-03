@@ -84,10 +84,10 @@ end
 
 function SheepMonitor:POLYMORPH_APPLIED(aura)
 	if self.db.char.enableOmniCC then
-		self:ShowOmniCC()
+		self:ShowOmniCC(aura)
 	end
 	if self.db.char.enableQuartz then
-		self:ShowQuartz()
+		self:ShowQuartz(aura)
 	end
 	if self.db.char.enablePolymorphMessages then
 		local message = L['WARNING_APPLIED']:format(aura.spellName, aura.destName)
@@ -123,10 +123,10 @@ end
 
 function SheepMonitor:POLYMORPH_REMOVED(aura)
 	if self.db.char.enableOmniCC then
-		self:HideOmniCC()
+		self:HideOmniCC(aura)
 	end
 	if self.db.char.enableQuartz then
-		self:HideQuartz()
+		self:HideQuartz(aura)
 	end
 	if self.db.char.enableAudibleBreak then
 		PlaySoundFile(self.db.char.audibleBreakSound)
