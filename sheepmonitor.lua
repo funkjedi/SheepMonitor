@@ -3,12 +3,6 @@ local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
 
 local LibAuraInfo = LibStub('LibAuraInfo-1.0')
 LibAuraInfo.auraInfo[3355] = '90;1' -- fixing incorrect value
-LibAuraInfo.auraInfo[28271] = '50;1'
-LibAuraInfo.auraInfo[28272] = '50;1'
-LibAuraInfo.auraInfo[61305] = '50;1'
-LibAuraInfo.auraInfoPvP[28271] = 10
-LibAuraInfo.auraInfoPvP[28272] = 10
-LibAuraInfo.auraInfoPvP[61305] = 10
 
 
 SheepMonitor = LibStub('AceAddon-3.0'):NewAddon('SheepMonitor', 'AceEvent-3.0', 'AceTimer-3.0')
