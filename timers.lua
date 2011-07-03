@@ -16,7 +16,10 @@ local function stopDragging(self, button)
 	if self.isMoving then
 		SheepMonitor.notifier:StopMovingOrSizing()
 		if self:IsVisible() then -- save our new position
-			SheepMonitor.db.char.notifierFramePosition = { self:GetParent():GetPoint() }
+			local point, _, relativePoint, xOffset, yOffset = SheepMonitor.notifier:GetPoint()
+			SheepMonitor.db.char.notifierFramePosition = {
+				point, _, relativePoint, xOffset, yOffset
+			}
 		end
 		self.isMoving = false
 	end
@@ -36,8 +39,9 @@ function SheepMonitor.Timer:New()
 	if not SheepMonitor.notifier then
 		SheepMonitor.notifier = CreateFrame('Frame', nil, UIParent)
 		if SheepMonitor.db.char.notifierFramePosition then
+			local point, _, relativePoint, xOffset, yOffset = unpack(SheepMonitor.db.char.notifierFramePosition)
 			SheepMonitor.notifier:ClearAllPoints()
-			SheepMonitor.notifier:SetPoint(unpack(SheepMonitor.db.char.notifierFramePosition))
+			SheepMonitor.notifier:SetPoint(point, UIParent, relativePoint, xOffset, yOffset)
 		else
 			SheepMonitor.notifier:SetPoint('CENTER')
 		end

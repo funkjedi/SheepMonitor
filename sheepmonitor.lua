@@ -15,7 +15,7 @@ function SheepMonitor:OnInitialize()
 			enableParty = false,
 			enablePolymorphMessages = false,
 			enableBreakMessages = true,
-			enableBreakWarningMessages = true,
+			enableBreakWarningMessages = false,
 			enableAudibleBreak = true,
 			audibleBreakSound = 'Sound\\Interface\\AlarmClockWarning3.wav',
 			enableAudibleBreakWarning = false,

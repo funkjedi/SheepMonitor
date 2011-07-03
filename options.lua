@@ -45,6 +45,17 @@ function SheepMonitor:CreateInterfaceOptions()
 	})
 	enableNotifier.frame:SetPoint('TOPLEFT', header.subheading, 'BOTTOMLEFT', 0, 0)
 
+	local growUpwards = wf.factory('CheckBox', {
+		key = 'growUpwards',
+		parent = frame,
+		label = L['GROW_UPWARDS'],
+		width = 400,
+		fontSize = 'small',
+		get = getOption,
+		set = setOption
+	})
+	growUpwards.frame:SetPoint('TOPLEFT', enableNotifier.frame, 'BOTTOMLEFT', 20, 6)
+
 	local enableOmniCC = wf.factory('CheckBox', {
 		key = 'enableOmniCC',
 		parent = frame,
@@ -53,7 +64,7 @@ function SheepMonitor:CreateInterfaceOptions()
 		get = getOption,
 		set = setOption
 	})
-	enableOmniCC.frame:SetPoint('TOPLEFT', enableNotifier.frame, 'BOTTOMLEFT', 0, 4)
+	enableOmniCC.frame:SetPoint('TOPLEFT', growUpwards.frame, 'BOTTOMLEFT', -20, 0)
 
 	local enableQuartz = wf.factory('CheckBox', {
 		key = 'enableQuartz',
