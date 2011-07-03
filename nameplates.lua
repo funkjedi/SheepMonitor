@@ -1,92 +1,54 @@
 
--- IsFrameNameplate: Checks to see if the frame is a Blizz nameplate
-local function IsFrameNameplate(frame)
-	local region = frame:GetRegions()
-	return region and region:GetObjectType() == "Texture" and region:GetTexture() == "Interface\\TargetingFrame\\UI-TargetingFrame-Flash"
-end
 
+--local WorldFrame = WorldFrame
+function FindNameplateFrames()
 
-local function FindNameplateFrames()
-	local children = WorldFrame:GetChildren()
-	for i = 1, select("#", children) do
-		local frame = select(i, children)
-		if IsFrameNameplate(frame) then
-			print('found nameplate')
+	for i = 1, select("#", WorldFrame:GetChildren()) do
+		local nameplateFrame = select(i, WorldFrame:GetChildren())
+
+		-- REGIONS
+		-- 1 = Threat glow, is the mob attacking you, or almost not etc
+		-- 2 = Health bar/level border
+		-- 3 = Border for the casting bar
+		-- 4 = Spell icon for the casting bar
+		-- 5 = Glow around the health bar when hovering over
+		-- 6 = Name text
+		-- 7 = Level text
+		-- 8 = Skull icon if the mob/player is 10 or more levels higher then you
+		-- 9 = Raid icon when you're close enough to the mob/player to see the name plate
+		-- 10 = Elite icon
+
+		local nativeGlowRegion, overlayRegion, highlightRegion, nameTextRegion, levelTextRegion, bossIconRegion, raidIconRegion, stateIconRegion = nameplateFrame:GetRegions()
+
+		-- if the frame is a nameplate then the first region should match the following criteria
+		if nativeGlowRegion and nativeGlowRegion:GetObjectType() == "Texture" and nativeGlowRegion:GetTexture() == "Interface\\TargetingFrame\\UI-TargetingFrame-Flash" then
+
+			--local healthBar, castBar = nameplateFrame:GetChildren()
+			--local castBarRegion, castBarOverlayRegion, castBarShieldRegion, spellIconRegion = castBar:GetRegions()
+
+			print(nameplateFrame:GetName())
 		end
 	end
 end
-
-
-FindNameplateFrames()
-
-
-
-
-
 
 
 
 --[[
 
-local IsNamePlateFrame = function(f)
-	local o = select(2,f:GetRegions())
-	if not o or o:GetObjectType() ~= "Texture" or o:GetTexture() ~= "Interface\\Tooltips\\Nameplate-Border" then
-		f.styled = true --don't touch this frame again
-		return false
-	end
-	return true
-end
 
-local lastupdate = 0
-
-local searchNamePlates = function(self,elapsed)
-	lastupdate = lastupdate + elapsed
-
-	if lastupdate > 0.33 then
-		lastupdate = 0
-		local num = select("#", WorldFrame:GetChildren())
-		for i = 1, num do
-			local f = select(i, WorldFrame:GetChildren())
-			if not f.styled and IsNamePlateFrame(f) then
-				styleNamePlate(f)
+local WorldFrame, numOfChildren = WorldFrame, 0
+local onUpdate = function(self)
+	local numOfNewChildren = WorldFrame:GetNumChildren()
+	if numOfChildren ~= numOfNewChildren then
+		for i = numOfChildren + 1, numOfNewChildren do
+			local frame = select(i, WorldFrame:GetChildren())
+			if IsFrameNameplate(frame) then
+				print('found nameplate')
 			end
 		end
-
+		numOfChildren = numOfNewChildren
 	end
 end
-
-
-PLATES = {}
-local plate, curChildren, numChildren
-
-
--- IsFrameNameplate: Checks to see if the frame is a Blizz nameplate
-local function IsFrameNameplate(frame)
-   local region = frame:GetRegions()
-   return region and region:GetObjectType() == "Texture" and region:GetTexture() == "Interface\\TargetingFrame\\UI-TargetingFrame-Flash"
-end
-
--- OnWorldFrameChange: Checks for new Blizz Plates
-local function OnWorldFrameChange(...)
-   for index = 1, select("#", ...) do
-      plate = select(index, ...)
-      if IsFrameNameplate(plate) then
-         table.insert(PLATES, plate)
-         print(plate)
-      end
-   end
-end
-
--- Detect New Nameplates
-curChildren = WorldFrame:GetNumChildren()
-if (curChildren ~= numChildren) then
-   numChildren = curChildren
-   OnWorldFrameChange(WorldFrame:GetChildren())
-end
-
-SlashCmdList['LuaBrowser']('filter PLATES')
-
 
 
 ]]
-
