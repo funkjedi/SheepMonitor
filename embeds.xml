@@ -10,5 +10,6 @@
 
 	<Script file="libs\Classy-1.0\Classy-1.0.lua"/>
 	<Include file="libs\LibAuraInfo-1.0\lib.xml"/>
+	<Include file="libs\LibNameplate-1.0\lib.xml"/>
 	<Include file="libs\LibWidgetFactory-1.0\LibWidgetFactory-1.0.xml"/>
 </Ui>

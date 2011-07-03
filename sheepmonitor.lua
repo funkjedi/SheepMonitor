@@ -23,6 +23,7 @@ function SheepMonitor:OnInitialize()
 			enableOmniCC = false,
 			enableQuartz = false,
 			growUpwards = false,
+			enableNameplates = false,
 		}
 	})
 

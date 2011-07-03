@@ -196,18 +196,39 @@ function SheepMonitor.Timer:UpdateTimers()
 
 	for i = 1, #timers do
 		if timers[i].aura then
-			local origTo = to
-			if lastBar == SheepMonitor.notifier then
-				to = from
+			if not timers[i]:AttachToNameplate() then
+				local origTo = to
+				if lastBar == SheepMonitor.notifier then
+					to = from
+				end
+				timers[i]:ClearAllPoints()
+				timers[i]:Show()
+				timers[i]:SetPoint(from.."LEFT",  lastBar, to.."LEFT",  0, 0)
+				timers[i]:SetPoint(from.."RIGHT", lastBar, to.."RIGHT", 0, 0)
+				lastBar = timers[i]
+				to = origTo
 			end
-			timers[i]:ClearAllPoints()
-			timers[i]:Show()
-			timers[i]:SetPoint(from.."LEFT",  lastBar, to.."LEFT",  0, 0)
-			timers[i]:SetPoint(from.."RIGHT", lastBar, to.."RIGHT", 0, 0)
-			lastBar = timers[i]
-			to = origTo
 		else
 			timers[i]:Hide()
+		end
+	end
+end
+
+local LibNameplate = LibStub('LibNameplate-1.0')
+function SheepMonitor.Timer.AttachToNameplate(timer)
+	if SheepMonitor.db.char.enableNameplates then
+		local nameplateFrame = LibNameplate:GetNameplateByGUID(timer.aura.destGUID)
+		if nameplateFrame then
+			print('attaching to nameplate for', timer.aura.destGUID)
+
+			--nameplateFrame:SetScript('OnHide', function() timer:Hide() end)
+			--nameplateFrame:SetScript('OnShow', function() timer:AttachToNameplate() end)
+
+			timer:ClearAllPoints()
+			timer:Show()
+			timer:SetPoint("BOTTOM",  nameplateFrame, "TOP",  0, 0)
+
+			return nameplateFrame
 		end
 	end
 end
