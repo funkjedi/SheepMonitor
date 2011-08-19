@@ -99,13 +99,15 @@ function SheepMonitor.Timer:New()
 	timer.label:SetPoint('RIGHT', -26, 0)
 	timer.label:SetJustifyH('LEFT')
 	timer.label:SetWordWrap(true)
-	timer.label:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSans.ttf', 11)
+	--timer.label:SetTextHeight(11)
+	timer.label:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 11)
 	-- create our timer text
 	timer.countdown = timer.statusBar:CreateFontString('ARTWORK', nil, 'GameFontNormal')
 	timer.countdown:SetPoint('TOP')
 	timer.countdown:SetPoint('BOTTOM')
 	timer.countdown:SetPoint('RIGHT', -4, 0)
-	timer.countdown:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSans.ttf', 13)
+	--timer.countdown:SetTextHeight(13)
+	timer.countdown:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 13)
 
 	table.insert(timers, timer)
 	return timer, #timers
