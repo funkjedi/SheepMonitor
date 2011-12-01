@@ -11,6 +11,7 @@ if L then
 
 	-- used for options
 	L['DESCRIPTION'] = 'SheepMonitor позволяет держать на виду все ваши виды кантроля для успешного контроля.'
+	L['MONITOR_RAID'] = 'Монитор игроку/группе/рейду сдерживание толпы'
 	L['ENABLE_NOTIFIER'] = 'Включить визуальное оповещение'
 	L['GROW_UPWARDS'] = 'Пролистывание вверх'
 	L['ENABLE_OMNICC'] = 'Включить интеграцию с OmniCC (Тест)'

@@ -76,10 +76,20 @@ function SheepMonitor:CreateInterfaceOptions()
 	})
 	enableQuartz.frame:SetPoint('TOPLEFT', enableOmniCC.frame, 'BOTTOMLEFT', 0, 4)
 
+	local monitorRaid = wf.factory('CheckBox', {
+		key = 'monitorRaid',
+		parent = frame,
+		label = L['MONITOR_RAID'],
+		width = 400,
+		get = getOption,
+		set = setOption
+	})
+	monitorRaid.frame:SetPoint('TOPLEFT', enableQuartz.frame, 'BOTTOMLEFT', 0, -10)
+
 
 	local raidheader = frame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
 	raidheader:SetText(L['WARNINGS_HEADER'])
-	raidheader:SetPoint('TOPLEFT', enableQuartz.frame, 'BOTTOMLEFT', 0, -20)
+	raidheader:SetPoint('TOPLEFT', monitorRaid.frame, 'BOTTOMLEFT', 0, -20)
 
 	local enableRaid = wf.factory('CheckBox', {
 		key = 'enableRaid',

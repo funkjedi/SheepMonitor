@@ -1,0 +1,41 @@
+1.9
+- updated for patch 4.3
+- added option monitoring other party/raid members cc
+- disabled Ring of Frost (uncomment line 13 in auras.lua to re-enable)
+
+1.8
+- added Russian translation; thanks to evilstar for the translation
+- added DroidSansFallback for proper font display is other locales
+
+1.7
+- fixed bug with expired notifier not disappearing when out of target range
+- added support for the tracking of multiple crowd control auras
+- replaced Dongle with Ace3
+
+1.6
+- updated for patch 4.2
+- updated the version of LibAuraInfo
+- added traditional chinese localization; thanks to SilentWorld for the translation
+
+1.5
+- updated for patch 4.1
+
+1.4
+- added support for Wyvern Sting, Banish, Fear, Seduction, Repentance, Turn Evil, Enslave Demon, Mind Control, Entangling Roots
+
+1.3
+- added support for Freezing Trap
+
+1.2
+- added a warning for when target becomes sheeped
+- changed wording in settings to make it more obvious what things do
+- fixed the toggle for break notification being honored
+- added support for Sap
+
+1.1
+- added Quartz integration
+- fixed lua errors that occurred when re-sheeping
+- visual notifier's frame position is now saved between sessions
+
+1.0
+- initial release

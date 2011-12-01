@@ -11,6 +11,7 @@ if L then
 
 	-- used for options
 	L['DESCRIPTION'] = 'SheepMonitor provides various methods of notification to help you keep track of your flock.'
+	L['MONITOR_RAID'] = 'Monitor party/battleground/raid cc'
 	L['ENABLE_NOTIFIER'] = 'Enable visual notifier'
 	L['GROW_UPWARDS'] = 'List grows upwards'
 	L['ENABLE_OMNICC'] = 'Enable OmniCC integration (experimental)'

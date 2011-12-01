@@ -9,6 +9,7 @@ SheepMonitor = LibStub('AceAddon-3.0'):NewAddon('SheepMonitor', 'AceEvent-3.0', 
 function SheepMonitor:OnInitialize()
 	self.db = LibStub('AceDB-3.0'):New('SheepMonitorDatabase', {
 		char = {
+			monitorRaid = false,
 			enableNotifier = true,
 			enableRaid = true,
 			enableChat = false,
@@ -38,8 +39,9 @@ end
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = select(1, ...)
 	-- watch for polymorphed mobs
-	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and sourceName == UnitName('player') then
-		if self.trackableAuras[spellId] then
+
+	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and self.trackableAuras[spellId] then
+		if (self.db.char.monitorRaid and UnitInRaid(sourceName)) or sourceName == UnitName('player') then
 			local aura = {
 				auraGUID = spellId .. destGUID, -- a unique identifier for this aura occurance
 				sourceGUID = sourceGUID,
@@ -53,7 +55,7 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID),
 			}
 			if destGUID == UnitGUID('target') then
-				aura.duration = select(6, UnitAura('target', spellName, nil, 'PLAYER|HARMFUL'))
+				aura.duration = select(6, UnitAura('target', spellName, nil, 'PLAYER|HARMFUL')) or 0
 			end
 			self:AuraApplied(aura)
 		end

@@ -11,6 +11,7 @@ if L then
 
 	-- used for options
 	L['DESCRIPTION'] = 'SheepMonitor 協助你追蹤控場及各種警告方式。'
+	L['MONITOR_RAID'] = '監視器 隊伍/戰場/團隊 人群控制'
 	L['ENABLE_NOTIFIER'] = '啟用控場計時器'
 	L['GROW_UPWARDS'] = 'List grows upwards'
 	L['ENABLE_OMNICC'] = '啟用 OmniCC 整合 (測試性)'
