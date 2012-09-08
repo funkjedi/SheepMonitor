@@ -1,0 +1,14 @@
+------------------------------------------------------------------------
+r108 | acapela | 2012-05-12 17:38:17 +0000 (Sat, 12 May 2012) | 1 line
+Changed paths:
+   A /tags/1.0.18 (from /trunk:107)
+
+Tagging as 1.0.18
+------------------------------------------------------------------------
+r107 | acapela | 2012-05-12 17:35:49 +0000 (Sat, 12 May 2012) | 2 lines
+Changed paths:
+   M /trunk/LibAuraInfo-1.0/LibAuraInfo-1.0.lua
+
+- Updated additional COMBAT_LOG_EVENT_UNFILTERED locations to accept WoW4.2 new variables.  
+- Changed minor to 18.
+------------------------------------------------------------------------
