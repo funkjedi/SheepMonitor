@@ -1,3 +1,6 @@
+1.10
+- updated for patch 5.0.0.4
+
 1.9
 - updated for patch 4.3
 - added option monitoring other party/raid members cc

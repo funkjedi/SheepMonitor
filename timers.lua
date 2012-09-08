@@ -63,10 +63,10 @@ function SheepMonitor.Timer:New()
 	timer:SetScript('OnMouseDown', startDragging)
 	timer:SetBackdrop({
 		bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
-		edgeFile = 'Interface\\Tooltips\\UI-DialogBox-Border',
+		edgeFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
 		tile = true,
 		tileSize = 32,
-		edgeSize = 6,
+		edgeSize = 1,
 		insets = {
 			left = 0,
 			right = 0,

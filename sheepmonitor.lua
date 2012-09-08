@@ -159,11 +159,11 @@ end
 
 function SheepMonitor:SendAnnouncement(message)
 	local chatType = false
-	if GetRealNumRaidMembers() > 0 then
+	if IsInRaid() then
 		chatType = "RAID"
-	elseif GetNumRaidMembers() > 0 then
+	elseif GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE) > 0 then
 		chatType = "BATTLEGROUND"
-	elseif GetNumPartyMembers() > 0 then
+	elseif IsInGroup() then
 		chatType = "PARTY"
 	end
 	if chatType then
