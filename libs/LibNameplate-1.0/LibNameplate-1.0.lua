@@ -5,9 +5,10 @@ Documentation: http://www.wowace.com/addons/libnameplate-1-0/pages/main/
 SVN:  svn://svn.wowace.com/wow/libnameplate-1-0/mainline/trunk
 Description: Alerts addons when a nameplate is shown or hidden. Has API to get info such as name, level, class, ect from the nameplate. LibNameplate tries to function with the default nameplates, Aloft, caelNamePlates and TidyPlates (buggy).
 Dependencies: LibStub, CallbackHandler-1.0
+License: GNU General Public License version 3 (GPLv3)
 ]]
 
-local MAJOR, MINOR = "LibNameplate-1.0", 30
+local MAJOR, MINOR = "LibNameplate-1.0", 36
 if not LibStub then error(MAJOR .. " requires LibStub.") return end
 
 --Create lib
@@ -54,6 +55,20 @@ local childOrder = {
 	[2] = "castBar",
 }
 
+----- Mist of Pandaria Compatibility layer -------
+
+local wowMoP
+do
+    local _, _, _, interface = GetBuildInfo();
+    wowMoP = (interface >= 50000);
+end
+
+local GetNumRaidMembers     = wowMoP and _G.GetNumGroupMembers or _G.GetNumRaidMembers;
+local GetNumPartyMembers    = wowMoP and _G.GetNumSubgroupMembers or _G.GetNumPartyMembers;
+
+--------------------------------------------------
+
+
 local regionIndex = {}
 local childIndex = {}
 
@@ -64,13 +79,14 @@ for i, name in ipairs(childOrder) do
 	childIndex[name] = i
 end
 
-local callbackOnHide		= "LibNameplate_RecycleNameplate"
-local callbackOnShow		= "LibNameplate_NewNameplate"
-local callbackFoundGUID		= "LibNameplate_FoundGUID"
-local callbackOnTarget		= "LibNameplate_TargetNameplate"
-local callbackHealthChanged	= "LibNameplate_HealthChange"
-local callbackCombatChanged = "LibNameplate_CombatChange"
-local callbackThreatChanged	= "LibNameplate_ThreatChange"
+local callbackOnHide				= "LibNameplate_RecycleNameplate"
+local callbackOnShow				= "LibNameplate_NewNameplate"
+local callbackFoundGUID				= "LibNameplate_FoundGUID"
+local callbackOnTarget				= "LibNameplate_TargetNameplate"
+local callbackHealthChanged			= "LibNameplate_HealthChange"
+local callbackCombatChanged 		= "LibNameplate_CombatChange"
+local callbackThreatChanged			= "LibNameplate_ThreatChange"
+local callbackMouseoverNameplate	= "LibNameplate_MouseoverNameplate"
 
 lib.nameplates		= lib.nameplates	or {}
 lib.realPlate		= lib.realPlate		or {}
@@ -124,7 +140,8 @@ do
 	function IsNamePlateFrame(frame)
 --~ 		debugPrint("IsNamePlateFrame", "--------------------------------------")
 
-		if frame.extended or frame.aloftData then
+		if frame.extended or frame.aloftData or frame.ElvUIPlate then
+
 			--Tidyplates = extended, Aloft = aloftData
 			--They sometimes remove & replace the children so this needs to be checked first.
 			return true
@@ -779,7 +796,7 @@ do
 				this:Show()
 			end
 		elseif event == "UPDATE_MOUSEOVER_UNIT" then
-			if GetMouseFocus():GetName() == "WorldFrame" then
+			if GetMouseFocus() and GetMouseFocus():GetName() == "WorldFrame" then
 				i = 0
 				for frame in pairs(lib.nameplates) do
 					if frame:IsShown() and lib:IsMouseover(frame) then
@@ -794,6 +811,7 @@ do
 						FoundPlateGUID(mouseoverPlate, UnitGUID("mouseover"), "mouseover")
 --~ 						debugPrint("mouseover",mouseoverPlate,lib:GetName(mouseoverPlate))
 					end
+					lib.callbacks:Fire(callbackMouseoverNameplate, lib.fakePlate[mouseoverPlate] or mouseoverPlate)
 				elseif i > 1 then
 					debugPrint(i.." mouseover frames")
 				end
@@ -1362,7 +1380,7 @@ do
 	function lib:GetAllNameplates()
 		wipe(frames)
 		for frame in pairs(self.nameplates) do 
-			table_insert(frames, frame)
+			table_insert(frames, self.fakePlate[frame] or frame)
 		end
 		return unpack(frames)
 	end
@@ -1370,7 +1388,7 @@ do
 	function lib:IteratePlates()
 		wipe(frames)
 		for frame in pairs(self.nameplates) do 
-			table_insert(frames, frame)
+			table_insert(frames, self.fakePlate[frame] or frame)
 		end
 		return pairs(frames)
 	end
