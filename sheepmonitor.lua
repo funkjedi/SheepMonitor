@@ -1,9 +1,6 @@
 
 local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
 
-local LibAuraInfo = LibStub('LibAuraInfo-1.0')
-LibAuraInfo.auraInfo[3355] = '60;1' -- fixing incorrect value
-
 
 SheepMonitor = LibStub('AceAddon-3.0'):NewAddon('SheepMonitor', 'AceEvent-3.0', 'AceTimer-3.0')
 function SheepMonitor:OnInitialize()
@@ -27,6 +24,12 @@ function SheepMonitor:OnInitialize()
 		}
 	})
 
+	-- restore the notifiers save position
+	if self.db.char.notifierFramePosition and SheepMonitorNotifierFrame then
+		SheepMonitorNotifierFrame:ClearAllPoints()
+		SheepMonitorNotifierFrame:SetPoint(unpack(self.db.char.notifierFramePosition))
+	end
+
 	self:CreateInterfaceOptions()
 	--InterfaceOptionsFrame_OpenToCategory('SheepMonitor')
 end
@@ -36,31 +39,15 @@ function SheepMonitor:OnEnable()
 end
 
 
-function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = select(1, ...)
-	-- watch for polymorphed mobs
 
-	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and self.trackableAuras[spellId] then
-		if (self.db.char.monitorRaid and UnitInRaid(sourceName)) or sourceName == UnitName('player') then
-			local aura = {
-				auraGUID = spellId .. destGUID, -- a unique identifier for this aura occurance
-				sourceGUID = sourceGUID,
-				sourceName = sourceName,
-				destGUID = destGUID,
-				destName = destName,
-				spellId = spellId,
-				spellName = spellName,
-				texture = self.trackableAuras[spellId],
-				timestamp = GetTime(),
-				duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID),
-			}
-			if destGUID == UnitGUID('target') then
-				aura.duration = select(6, UnitAura('target', spellName, nil, 'PLAYER|HARMFUL')) or 0
-			end
-			self:AuraApplied(aura)
-		end
-	end
-	-- watch for damage on our polymorph and record whoever breaks
+do
+	local auraEventTypes = {
+		['SPELL_AURA_APPLIED'] = true,
+		['SPELL_AURA_REFRESH'] = true,
+	}
+	local auraBrokenEventTypes = {
+		['SPELL_AURA_REMOVED'] = true,
+	}
 	local damageEventTypes = {
 		['SWING_DAMAGE'] = true,
 		['RANGE_DAMAGE'] = true,
@@ -71,17 +58,26 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		['DAMAGE_SPLIT'] = true,
 		['DAMAGE_SHIELD'] = true,
 	}
-	if self.watchForBreakers and self.watchForBreakers > 0 and damageEventTypes[eventType] then
-		self:AuraBroken(destGUID, sourceName, eventType == 'SWING_DAMAGE' and 'Melee' or spellName)
-	end
-	-- watch for our polymorph to dissipate
-	if eventType == 'SPELL_AURA_REMOVED' then
-		if self.trackableAuras[spellId] then
-			self:AuraRemoved(destGUID, spellId)
+	function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
+		local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = select(1, ...)
+
+		-- watch for polymorphed mobs
+		if auraEventTypes[eventType] and SheepMonitor.Aura.trackable[spellId] then
+			if sourceName == UnitName('player') or (self.db.char.monitorRaid and UnitInRaid(sourceName)) then
+				local aura = SheepMonitor.AuraWatcher:Add(...)
+				self:POLYMORPH_APPLIED(aura);
+			end
+		end
+		-- watch for our polymorph to dissipate
+		if auraBrokenEventTypes[eventType] and SheepMonitor.Aura.trackable[spellId] then
+			SheepMonitor.AuraWatcher:Broken(...)
+		end
+		-- watch for damage on our polymorph and record whoever breaks
+		if damageEventTypes[eventType] and self.watchForBreakers and self.watchForBreakers > 0 then
+			SheepMonitor.AuraWatcher:Breaker(...)
 		end
 	end
 end
-
 
 
 function SheepMonitor:POLYMORPH_APPLIED(aura)

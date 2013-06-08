@@ -1,235 +1,209 @@
 
-SheepMonitor.Timer = LibStub('Classy-1.0'):New('Frame')
-SheepMonitor.Timer:Hide()
 
-local timers = {}
+local NotifierFrame = CreateFrame('Frame', 'SheepMonitorNotifierFrame', UIParent)
+NotifierFrame:SetMovable(true)
+NotifierFrame:SetClampedToScreen(true)
+NotifierFrame:SetWidth(140)
+NotifierFrame:SetHeight(28)
+NotifierFrame:SetPoint('CENTER')
 
-
--- utility functions for making frames draggable
-local function startDragging(self, button)
-	if button == "RightButton" and not self.isMoving then
-		SheepMonitor.notifier:StartMoving()
-		self.isMoving = true
-	end
-end
-local function stopDragging(self, button)
-	if self.isMoving then
-		SheepMonitor.notifier:StopMovingOrSizing()
-		if self:IsVisible() then -- save our new position
-			local point, _, relativePoint, xOffset, yOffset = SheepMonitor.notifier:GetPoint()
-			SheepMonitor.db.char.notifierFramePosition = {
-				point, _, relativePoint, xOffset, yOffset
-			}
-		end
-		self.isMoving = false
+function NotifierFrame_OnDrag(self, button)
+	if button == "RightButton" and not NotifierFrame.isMoving then
+		NotifierFrame:StartMoving()
+		NotifierFrame.isMoving = true
 	end
 end
 
-
-function SheepMonitor.Timer:New()
-	-- look for a timer which can be recycled
-	-- this is important since frames can't be deleted once created
-	for index, timer in ipairs(timers) do
-		if not timer.aura then
-			return timer
+local function NotifierFrame_OnDragRelease(self, button)
+	if NotifierFrame.isMoving then
+		NotifierFrame:StopMovingOrSizing()
+		NotifierFrame.isMoving = false
+		if NotifierFrame:IsVisible() then
+			SheepMonitor.db.char.notifierFramePosition = { NotifierFrame:GetPoint() }
 		end
 	end
+end
 
-	-- create our notifier frame if it hasn't been created already
-	if not SheepMonitor.notifier then
-		SheepMonitor.notifier = CreateFrame('Frame', nil, UIParent)
-		if SheepMonitor.db.char.notifierFramePosition then
-			local point, _, relativePoint, xOffset, yOffset = unpack(SheepMonitor.db.char.notifierFramePosition)
-			SheepMonitor.notifier:ClearAllPoints()
-			SheepMonitor.notifier:SetPoint(point, UIParent, relativePoint, xOffset, yOffset)
-		else
-			SheepMonitor.notifier:SetPoint('CENTER')
+local function NotifierFrame_OnUpdate(self, button)
+	if NotifierFrame.isMoving then
+		NotifierFrame:StopMovingOrSizing()
+		NotifierFrame.isMoving = false
+		if NotifierFrame:IsVisible() then
+			SheepMonitor.db.char.notifierFramePosition = { NotifierFrame:GetPoint() }
 		end
-		SheepMonitor.notifier:SetWidth(140)
-		SheepMonitor.notifier:SetHeight(28)
-		SheepMonitor.notifier:SetMovable(true)
-		SheepMonitor.notifier:SetClampedToScreen(true)
 	end
+end
 
-	-- create a new timer
-	local timer = SheepMonitor.Timer:Bind(CreateFrame('Frame', nil, SheepMonitor.notifier))
-	timer:Hide()
-	timer:SetWidth(140)
-	timer:SetHeight(28)
-	timer:SetPoint('CENTER')
-	timer:EnableMouse(true)
-	timer:SetScript('OnHide', stopDragging)
-	timer:SetScript('OnMouseUp', stopDragging)
-	timer:SetScript('OnMouseDown', startDragging)
-	timer:SetBackdrop({
+
+
+local instances = {}
+
+local CountdownBar = {}
+CountdownBar.__index = CountdownBar;
+
+
+-- since frames cant be cleanup/deleted/etc its important to
+-- recycle the frames used for timers to avoid bloat
+function SheepMonitor:CountdownBar(aura)
+	for index, instance in ipairs(instances) do
+		if instance.recycle then
+			instance.recycle = false;
+			return instance:SetAura(aura)
+		end
+	end
+	local instance = CountdownBar.New()
+	table.insert(instances, instance)
+	return instance:SetAura(aura)
+end
+
+
+function CountdownBar.New()
+	local self = { recycle=false }
+
+	self.frame = CreateFrame('Frame', nil, NotifierFrame)
+	self.frame:Hide()
+	self.frame:EnableMouse(true)
+	self.frame:SetWidth(140)
+	self.frame:SetHeight(28)
+	self.frame:SetPoint('CENTER')
+	self.frame:SetBackdrop({
 		bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
 		edgeFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
 		tile = true,
 		tileSize = 32,
 		edgeSize = 1,
-		insets = {
-			left = 0,
-			right = 0,
-			top = 0,
-			bottom = 0
-		}
+		insets = {left = 0, right = 0, top = 0, bottom = 0}
 	})
-	-- create our icon texture; default to the polymorph spell
-	timer.texture = timer:CreateTexture('ARTWORK')
-	timer.texture:SetTexture('Interface\\Icons\\Spell_nature_polymorph')
-	timer.texture:SetSize(23, 23)
-	timer.texture:SetPoint('LEFT', 3, 0)
-	timer.texture:SetTexCoord(0.08,0.92,0.08,0.92)
-	-- create our status bar
-	timer.statusBar = CreateFrame('StatusBar', nil, timer, 'TextStatusBar')
-	timer.statusBar:SetWidth(110)
-	timer.statusBar:SetHeight(26)
-	timer.statusBar:SetPoint('BOTTOMLEFT', timer, 27, 1)
-	timer.statusBar:SetStatusBarTexture('Interface\\TargetingFrame\\UI-StatusBar')
-	timer.statusBar:SetStatusBarColor(1, 0, 0)
-	timer.statusBar:EnableMouse(true)
-	timer.statusBar:SetScript('OnHide', stopDragging)
-	timer.statusBar:SetScript('OnMouseUp', stopDragging)
-	timer.statusBar:SetScript('OnMouseDown', startDragging)
-	-- create our unit name label
-	timer.label = timer.statusBar:CreateFontString('ARTWORK', nil, 'GameFontHighlightSmall')
-	timer.label:SetPoint('TOP')
-	timer.label:SetPoint('BOTTOM')
-	timer.label:SetPoint('LEFT', 4, 0)
-	timer.label:SetPoint('RIGHT', -26, 0)
-	timer.label:SetJustifyH('LEFT')
-	timer.label:SetWordWrap(true)
-	--timer.label:SetTextHeight(11)
-	timer.label:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 11)
-	-- create our timer text
-	timer.countdown = timer.statusBar:CreateFontString('ARTWORK', nil, 'GameFontNormal')
-	timer.countdown:SetPoint('TOP')
-	timer.countdown:SetPoint('BOTTOM')
-	timer.countdown:SetPoint('RIGHT', -4, 0)
-	--timer.countdown:SetTextHeight(13)
-	timer.countdown:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 13)
+	self.frame:SetScript('OnMouseDown', NotifierFrame_OnDrag)
+	self.frame:SetScript('OnMouseUp', NotifierFrame_OnDragRelease)
+	self.frame:SetScript('OnHide', NotifierFrame_OnDragRelease)
 
-	table.insert(timers, timer)
-	return timer, #timers
+	self.texture = self.frame:CreateTexture('ARTWORK')
+	self.texture:SetTexture('Interface\\Icons\\Spell_nature_polymorph')
+	self.texture:SetSize(23, 23)
+	self.texture:SetPoint('LEFT', 3, 0)
+	self.texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+
+	self.status = CreateFrame('StatusBar', nil, self.frame, 'TextStatusBar')
+	self.status:EnableMouse(true)
+	self.status:SetWidth(110)
+	self.status:SetHeight(26)
+	self.status:SetPoint('BOTTOMLEFT', 27, 1)
+	self.status:SetStatusBarTexture('Interface\\TargetingFrame\\UI-StatusBar')
+	self.status:SetStatusBarColor(1, 0, 0)
+	self.status:SetScript('OnMouseDown', NotifierFrame_OnDrag)
+	self.status:SetScript('OnMouseUp', NotifierFrame_OnDragRelease)
+	self.status:SetScript('OnHide', NotifierFrame_OnDragRelease)
+
+	self.label = self.status:CreateFontString('ARTWORK', nil, 'GameFontHighlightSmall')
+	self.label:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 11)
+	self.label:SetJustifyH('LEFT')
+	self.label:SetWordWrap(true)
+	self.label:SetPoint('TOP')
+	self.label:SetPoint('BOTTOM')
+	self.label:SetPoint('LEFT', 4, 0)
+	self.label:SetPoint('RIGHT', -26, 0)
+
+	self.countdown = self.status:CreateFontString('ARTWORK', nil, 'GameFontNormal')
+	self.countdown:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 13)
+	self.countdown:SetPoint('TOP')
+	self.countdown:SetPoint('BOTTOM')
+	self.countdown:SetPoint('RIGHT', -4, 0)
+
+	setmetatable(self, CountdownBar);
+	return self
 end
 
-function SheepMonitor.Timer:Get(aura)
-	for index, timer in ipairs(timers) do
-		if timer.aura and timer.aura.auraGUID == aura.auraGUID then
-			return timer, index
-		end
-	end
+function CountdownBar:SetAura(aura)
+	self:Stop()
+	self.label:SetText(aura.destName)
+	self.texture:SetTexture(aura.texture)
+	self.status:SetMinMaxValues(0, aura.duration)
+	self.status:SetValue(aura.duration)
+	self.countdown:SetText(aura.duration)
+	self.remaining = aura.duration
+	self.aura = aura
+	return self
 end
 
-function SheepMonitor.Timer:Start(aura)
-	if self.aura then
+function CountdownBar:Release(skipRefresh)
+	self:Stop()
+	self.label:SetText('')
+	self.texture:SetTexture('Interface\\Icons\\Spell_nature_polymorph')
+	self.status:SetMinMaxValues(0, 0)
+	self.status:SetValue(0)
+	self.countdown:SetText('')
+	self.aura = nil
+	self.recycle = true;
+	return self
+end
+
+function CountdownBar:Start()
+	if self.running then
 		self:Stop()
 	end
-	self.aura = aura
-	if SheepMonitor.db.char.enableNotifier then
-		self.label:SetText(aura.destName)
-		self.texture:SetTexture(aura.texture)
-		self.statusBar:SetMinMaxValues(0, aura.duration)
-		self.statusBar:SetValue(aura.duration)
-		self.countdown:SetText(aura.duration)
-		self:UpdateTimers()
+	self.running = true
+	self.start = GetTime()
+	self.expires = self.start + self.remaining
+	self.looptimer = SheepMonitor:ScheduleRepeatingTimer(CountdownBar.OnLoop, 0.04, self)
+	self.updatetimer = SheepMonitor:ScheduleRepeatingTimer(CountdownBar.OnUpdate, 1, self)
+	self.frame:Show()
+	self.Refresh()
+	return self
+end
+
+function CountdownBar:Stop()
+	if self.running then
+		SheepMonitor:CancelTimer(self.looptimer, true)
+		SheepMonitor:CancelTimer(self.updatetimer, true)
+		self.frame:Hide()
+		self.running = false
+		self.start = nil
+		self.expires = nil
+		self.Refresh()
 	end
-	self:ScheduleRepeatingTimers()
+	return self
 end
 
-function SheepMonitor.Timer:Stop()
-	self:CancelRepeatingTimers()
-	self:Hide()
-	self.aura = nil
-	self:UpdateTimers()
-end
-
-function SheepMonitor.Timer:GetRemaining(raw)
-	local remaining = self.aura.duration - (GetTime() - self.aura.timestamp)
-	return raw and remaining or floor(remaining)
-end
-
-function SheepMonitor.Timer:ScheduleRepeatingTimers()
-	local onFinished = function(timer)
-		local remaining = timer:GetRemaining()
-		if remaining > 0 then
-			timer:OnFinished(remaining)
-		else
-			timer:OnFinished(0)
-			timer:Stop()
-		end
-	end
-	self.onFinishedTimer = SheepMonitor:ScheduleRepeatingTimer(onFinished, 1, self)
-	if self:IsVisible() then
-		local onUpdate = function(timer)
-			local remaining = timer:GetRemaining(true)
-			if remaining > 0 then
-				timer:OnUpdate(remaining)
-			end
-		end
-		self.onUpdateTimer = SheepMonitor:ScheduleRepeatingTimer(onUpdate, 0.02, self)
+function CountdownBar:OnLoop()
+	local timestamp = GetTime()
+	if timestamp >= self.expires then
+		self:Stop()
+	else
+		self.remaining = self.expires - timestamp
+		self.status:SetValue(self.remaining)
 	end
 end
 
-function SheepMonitor.Timer:CancelRepeatingTimers()
-	SheepMonitor:CancelTimer(self.onFinishedTimer, true)
-	SheepMonitor:CancelTimer(self.onUpdateTimer, true)
+function CountdownBar:OnUpdate()
+	local remaining = floor(self.remaining)
+	self.countdown:SetText(remaining)
+	SheepMonitor:POLYMORPH_UPDATE(self.aura.spellName, remaining)
 end
 
-function SheepMonitor.Timer:OnFinished(remaining)
-	SheepMonitor:POLYMORPH_UPDATE(self.aura, remaining)
-	if self:IsVisible() then
-		self.countdown:SetText(remaining)
-	end
-end
 
-function SheepMonitor.Timer:OnUpdate(remaining)
-	self.statusBar:SetValue(remaining)
-end
-
-function SheepMonitor.Timer:UpdateTimers()
-	local lastBar = SheepMonitor.notifier
+function CountdownBar.Refresh()
 	local from, to = "BOTTOM", "TOP"
+	local relativeTo = NotifierFrame
 
 	if not SheepMonitor.db.char.growUpwards then
-		from = "TOP"
-		to = "BOTTOM"
+		local from, to = "TOP", "BOTTOM"
 	end
 
-	for i = 1, #timers do
-		if timers[i].aura then
+	for index, instance in ipairs(instances) do
+		if instance.running then
 			local origTo = to
-			if lastBar == SheepMonitor.notifier then
+			if relativeTo == NotifierFrame then
 				to = from
 			end
-			timers[i]:ClearAllPoints()
-			timers[i]:Show()
-			timers[i]:SetPoint(from.."LEFT",  lastBar, to.."LEFT",  0, 0)
-			timers[i]:SetPoint(from.."RIGHT", lastBar, to.."RIGHT", 0, 0)
-			lastBar = timers[i]
+			instance.frame:ClearAllPoints()
+			instance.frame:Show()
+			instance.frame:SetPoint(from.."LEFT",  relativeTo, to.."LEFT",  0, 0)
+			instance.frame:SetPoint(from.."RIGHT", relativeTo, to.."RIGHT", 0, 0)
+			relativeTo = instance.frame
 			to = origTo
 		else
-			timers[i]:Hide()
+			instance:Release(true)
 		end
 	end
-end
-
-
-
--- FOR TESTING PURPOSES ONLY
-function SheepMonitor:CreateTestTimer(duration)
-	local aura = {
-		auraGUID = 118 .. math.random(0,200),
-		sourceGUID = 0,
-		sourceName = 'Player',
-		destGUID = 0,
-		destName = 'Target',
-		spellId = 118,
-		spellName = 'Polymorph',
-		texture = self.trackableAuras[118],
-		timestamp = GetTime(),
-		duration = duration or 30
-	}
-	aura.timer = SheepMonitor.Timer:Get(aura) or SheepMonitor.Timer:New()
-	aura.timer:Start(aura)
 end
