@@ -3,6 +3,7 @@ local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
 
 local LibAuraInfo = LibStub('LibAuraInfo-1.0')
 LibAuraInfo.auraInfo[3355] = '60;1' -- fixing incorrect value
+LibAuraInfo.auraInfo[115078] = '40;1' -- adding ability_monk_paralysis
 
 
 SheepMonitor = LibStub('AceAddon-3.0'):NewAddon('SheepMonitor', 'AceEvent-3.0', 'AceTimer-3.0')

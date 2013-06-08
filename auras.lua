@@ -5,29 +5,30 @@ SheepMonitor.auras = {}
 
 -- theses are the cc auras that we track
 SheepMonitor.trackableAuras = {
-	[118]   = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph
-	[28271] = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',        -- Polymorph (Turtle)
-	[28272] = 'Interface\\Icons\\Spell_Magic_PolymorphPig',         -- Polymorph (Pig)
-	[61305] = 'Interface\\Icons\\Achievement_Halloween_Cat_01',     -- Polymorph (Cat)
-	[61721] = 'Interface\\Icons\\Spell_Magic_PolymorphRabbit',      -- Polymorph (Rabbit)
---	[82691] = 'Interface\\Icons\\Spell_Frost_Ring Of Frost',        -- Ring of Frost
-	[51514] = 'Interface\\Icons\\Spell_Shaman_Hex',                 -- Hex
-	[76780] = 'Interface\\Icons\\Spell_Shaman_BindElemental',       -- Bind Elemental
-	[9484]  = 'Interface\\Icons\\Spell_Nature_Slow',                -- Shackle Undead
-	[8122]  = 'Interface\\Icons\\Spell_Shadow_PsychicScream',       -- Psychic Scream
-	[605]   = 'Interface\\Icons\\Spell_Shadow_ShadowWordDominate',  -- Mind Control
-	[2637]  = 'Interface\\Icons\\Spell_Nature_Sleep',               -- Hibernate
-	[6770]  = 'Interface\\Icons\\Ability_Sap',                      -- Sap
-	[3355]  = 'Interface\\Icons\\Spell_Frost_ChainsOfIce',          -- Freezing Trap
-	[19386] = 'Interface\\Icons\\Inv_Spear_02',                     -- Wyvern Sting
-	[1513]  = 'Interface\\Icons\\Ability_Druid_Cower',              -- Scare Beast
-	[710]   = 'Interface\\Icons\\Spell_Shadow_Cripple',             -- Banish
-	[5782]  = 'Interface\\Icons\\Spell_Shadow_Possession',          -- Fear
-	[6358]  = 'Interface\\Icons\\Spell_Shadow_MindSteal',           -- Seduction
-	[20066] = 'Interface\\Icons\\Spell_Holy_PrayerOfHealing',       -- Repentance
-	[10326] = 'Interface\\Icons\\Spell_Holy_TurnUndead',            -- Turn Evil
-	[1098]  = 'Interface\\Icons\\Spell_Shadow_EnslaveDemon',        -- Enslave Demon
-	[339]   = 'Interface\\Icons\\Spell_Nature_StrangleVines',       -- Entangling Roots
+	[118]    = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph
+	[28271]  = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',        -- Polymorph (Turtle)
+	[28272]  = 'Interface\\Icons\\Spell_Magic_PolymorphPig',         -- Polymorph (Pig)
+	[61305]  = 'Interface\\Icons\\Achievement_Halloween_Cat_01',     -- Polymorph (Cat)
+	[61721]  = 'Interface\\Icons\\Spell_Magic_PolymorphRabbit',      -- Polymorph (Rabbit)
+--	[82691]  = 'Interface\\Icons\\Spell_Frost_Ring Of Frost',        -- Ring of Frost
+	[51514]  = 'Interface\\Icons\\Spell_Shaman_Hex',                 -- Hex
+	[76780]  = 'Interface\\Icons\\Spell_Shaman_BindElemental',       -- Bind Elemental
+	[9484]   = 'Interface\\Icons\\Spell_Nature_Slow',                -- Shackle Undead
+	[8122]   = 'Interface\\Icons\\Spell_Shadow_PsychicScream',       -- Psychic Scream
+	[605]    = 'Interface\\Icons\\Spell_Shadow_ShadowWordDominate',  -- Mind Control
+	[2637]   = 'Interface\\Icons\\Spell_Nature_Sleep',               -- Hibernate
+	[6770]   = 'Interface\\Icons\\Ability_Sap',                      -- Sap
+	[3355]   = 'Interface\\Icons\\Spell_Frost_ChainsOfIce',          -- Freezing Trap
+	[19386]  = 'Interface\\Icons\\Inv_Spear_02',                     -- Wyvern Sting
+	[1513]   = 'Interface\\Icons\\Ability_Druid_Cower',              -- Scare Beast
+	[710]    = 'Interface\\Icons\\Spell_Shadow_Cripple',             -- Banish
+	[5782]   = 'Interface\\Icons\\Spell_Shadow_Possession',          -- Fear
+	[6358]   = 'Interface\\Icons\\Spell_Shadow_MindSteal',           -- Seduction
+	[20066]  = 'Interface\\Icons\\Spell_Holy_PrayerOfHealing',       -- Repentance
+	[10326]  = 'Interface\\Icons\\Spell_Holy_TurnUndead',            -- Turn Evil
+	[1098]   = 'Interface\\Icons\\Spell_Shadow_EnslaveDemon',        -- Enslave Demon
+	[339]    = 'Interface\\Icons\\Spell_Nature_StrangleVines',       -- Entangling Roots
+	[115078] = 'Interface\\Icons\\ability_monk_paralysis',           -- Paralysis
 }
 
 

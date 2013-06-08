@@ -1,3 +1,6 @@
+1.12
+- added support for Paralysis
+
 1.11
 - updated for patch 5.3
 - updated Ace3 versions
