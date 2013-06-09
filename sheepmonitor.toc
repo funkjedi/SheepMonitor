@@ -2,11 +2,13 @@
 ## Title: Sheep Monitor
 ## Notes: Provides various methods of notification to help you keep track of your flock.
 ## Author: funkjedi
-## Version: 1.12
+## Version: 1.13
 ## SavedVariables: SheepMonitorDatabase
 
 embeds.xml
 localization\localization.enUS.lua
+localization\localization.esMX.lua
+localization\localization.esES.lua
 localization\localization.ruRU.lua
 localization\localization.zhTW.lua
 sheepmonitor.lua

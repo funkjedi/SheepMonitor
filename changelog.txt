@@ -1,3 +1,6 @@
+1.13
+- added Spanish translations (esES and esMX); thanks to Triston at T.A.G. Translations and Design
+
 1.12
 - added support for Paralysis
 
