@@ -1,5 +1,6 @@
 1.13
-- added Spanish translations (esES and esMX); thanks to Triston at T.A.G. Translations and Design
+- added Spanish translations (esES and esMX); thanks to Triston at T.A.G. Translations and Design for the translation
+- added missing zhTW tranlations; thanks to BNSSNB for the translation
 
 1.12
 - added support for Paralysis
