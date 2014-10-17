@@ -1241,14 +1241,9 @@ end
 --------------------------------------------------------------
 local GUIDIsPlayer
 do
-	local B, maskedB
-	local tonumber = tonumber
 	function GUIDIsPlayer(guid)
-		B = tonumber(guid:sub(5,5), 16);
-		maskedB = B % 8; -- x % 8 has the same effect as x & 0x7 on numbers <= 0xf
-	--~ 	local knownTypes = {[0]="player", [3]="NPC", [4]="pet", [5]="vehicle"};
-	--~ 	print("Your target is a " .. (knownTypes[maskedB] or " unknown entity!"));
-		if maskedB == 0 then
+		local unitType, _, serverID, instanceID, zoneID, npcID, spawnID = strsplit("-", guid)
+		if unitType == "Player" then
 			return true
 		end
 		return false
