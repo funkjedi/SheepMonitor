@@ -89,16 +89,13 @@ end
 --created for testing purposes
 
 function SheepMonitor:GetSpellInfo(spellId, FROM_SPELLBOOK)
-	local name, rank, icon, powerCost, isFunnel, powerType, castingTime, minRange, maxRange = FROM_SPELLBOOK and GetSpellInfo(spellId, BOOKTYPE_SPELL) or GetSpellInfo(spellId)
+	local name, rank, icon, castingTime, minRange, maxRange = FROM_SPELLBOOK and GetSpellInfo(spellId, BOOKTYPE_SPELL) or GetSpellInfo(spellId)
 	if name then
 		local spell = {
 			id = FROM_SPELLBOOK and select(2, GetSpellBookItemInfo(name)) or spellId,
 			name = name,
 			rank = rank,
 			icon = icon,
-			powerCost = powerCost,
-			isFunnel = isFunnel,
-			powerType = powerType,
 			castingTime = castingTime,
 			minRange = minRange,
 			maxRange = maxRange,

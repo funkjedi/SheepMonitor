@@ -167,7 +167,7 @@ function SheepMonitor.Timer:ScheduleRepeatingTimers()
 				timer:OnUpdate(remaining)
 			end
 		end
-		self.onUpdateTimer = SheepMonitor:ScheduleRepeatingTimer(onUpdate, 0.02, self)
+		self.onUpdateTimer = SheepMonitor:ScheduleRepeatingTimer(onUpdate, 0.1, self)
 	end
 end
 
