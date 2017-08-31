@@ -1,8 +1,8 @@
-## Interface: 70000
+## Interface: 70300
 ## Title: Sheep Monitor
 ## Notes: Provides various methods of notification to help you keep track of your flock.
 ## Author: funkjedi
-## Version: 1.15
+## Version: 1.16
 ## SavedVariables: SheepMonitorDatabase
 ## OptionalDeps: Ace3, LibAuraInfo-1.0
 
