@@ -12,7 +12,7 @@ localization\localization.esMX.lua
 localization\localization.esES.lua
 localization\localization.ruRU.lua
 localization\localization.zhTW.lua
-sheepmonitor.lua
+main.lua
 auras.lua
 timers.lua
 integrations.lua
