@@ -2,33 +2,16 @@
 package-as: SheepMonitor
 
 externals:
-    libs/LibStub:
-        url: svn://svn.wowace.com/wow/libstub/mainline/trunk
-        tag: latest
-    libs/CallbackHandler-1.0:
-        url: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
-        tag: latest
-    libs/AceAddon-3.0:
-        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceAddon-3.0
-        tag: latest
-    libs/AceDB-3.0:
-        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDB-3.0
-        tag: latest
-    libs/AceEvent-3.0:
-        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceEvent-3.0
-        tag: latest
-    libs/AceGUI-3.0:
-        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
-        tag: latest
-    libs/AceLocale-3.0:
-        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
-        tag: latest
-    libs/AceTimer-3.0:
-        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceTimer-3.0
-        tag: latest
-    libs/LibWidgetFactory-1.0/libs/AceGUI-3.0:
-        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
-        tag: latest
+    libs/LibStub: https://repos.wowace.com/wow/libstub/tags/1.0
+    libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+    libs/AceAddon-3.0: https://repos.wowace.com/wow/ace3/trunk/AceAddon-3.0
+    libs/AceDB-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDB-3.0
+    libs/AceEvent-3.0: https://repos.wowace.com/wow/ace3/trunk/AceEvent-3.0
+    libs/AceGUI-3.0: https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
+    libs/AceLocale-3.0: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
+    libs/AceTimer-3.0: https://repos.wowace.com/wow/ace3/trunk/AceTimer-3.0
+    libs/LibAuras: https://repos.wowace.com/wow/libauras
+    libs/LibWidgetFactory-1.0/libs/AceGUI-3.0: https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
 
 enable-nolib-creation: no
 

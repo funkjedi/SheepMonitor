@@ -1,3 +1,9 @@
+1.17
+- updated for patch 8.0.1
+- adding integration with LibAuras
+- hotfixing LibAuraInfo polymorph durations
+- updated pkgmeta externals
+
 1.16
 - updated for patch 7.3.0
 - updated Ace3 versions

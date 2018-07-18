@@ -2,8 +2,21 @@
 local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
 
 local LibAuraInfo = LibStub('LibAuraInfo-1.0')
-LibAuraInfo.auraInfo[3355] = '60;1' -- fixing incorrect value
+LibAuraInfo.auraInfo[118]    = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[28271]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[28272]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[61305]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[61721]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[61780]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[126819] = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[161353] = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[161354] = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[161355] = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[161372] = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[3355]   = '60;1' -- fixing incorrect value
 LibAuraInfo.auraInfo[115078] = '40;1' -- adding ability_monk_paralysis
+
+local LibAuras = LibStub:GetLibrary('LibAuras')
 
 
 SheepMonitor = LibStub('AceAddon-3.0'):NewAddon('SheepMonitor', 'AceEvent-3.0', 'AceTimer-3.0')
@@ -38,9 +51,8 @@ end
 
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = select(1, ...)
+	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = CombatLogGetCurrentEventInfo()
 	-- watch for polymorphed mobs
-
 	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and self.trackableAuras[spellId] then
 		if (self.db.char.monitorRaid and UnitInRaid(sourceName)) or sourceName == UnitName('player') then
 			local aura = {
@@ -56,7 +68,7 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID),
 			}
 			if destGUID == UnitGUID('target') then
-				aura.duration = select(6, UnitAura('target', spellName, nil, 'PLAYER|HARMFUL')) or 0
+				aura.duration = select(5, LibAuras:UnitAura('target', spellId, 'PLAYER|HARMFUL')) or 0
 			end
 			self:AuraApplied(aura)
 		end
