@@ -6,16 +6,19 @@ SheepMonitor.auras = {}
 -- theses are the cc auras that we track
 SheepMonitor.trackableAuras = {
 	[118]    = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph
-	[28271]  = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',        -- Polymorph (Turtle)
 	[28272]  = 'Interface\\Icons\\Spell_Magic_PolymorphPig',         -- Polymorph (Pig)
+	[28271]  = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',        -- Polymorph (Turtle)
+	[61780]  = 'Interface\\Icons\\Achievement_WorldEvent_Thanksgiving', -- Polymorph (Turkey)
 	[61305]  = 'Interface\\Icons\\Achievement_Halloween_Cat_01',     -- Polymorph (Black Cat)
+	[161372] = 'Interface\\Icons\\Inv_Pet_Peacock_Gold',             -- Polymorph (Peacock)
 	[61721]  = 'Interface\\Icons\\Spell_Magic_PolymorphRabbit',      -- Polymorph (Rabbit)
-	[61780]  = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Turkey)
-	[126819] = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Porcupine)
-	[161353] = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Polar Bear Cub)
-	[161354] = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Monkey)
-	[161355] = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Penguin)
-	[161372] = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Monkey)
+	[161354] = 'Interface\\Icons\\Ability_Hunter_AspectOfTheMonkey', -- Polymorph (Monkey)
+	[161372] = 'Interface\\Icons\\Ability_Hunter_AspectOfTheMonkey', -- Polymorph (Monkey)
+	[126819] = 'Interface\\Icons\\Inv_Pet_Porcupine',                -- Polymorph (Porcupine)
+	[161355] = 'Interface\\Icons\\Inv_Misc_PenguinPet',              -- Polymorph (Penguin)
+	[161353] = 'Interface\\Icons\\Inv_Pet_BabyBlizzardBear',         -- Polymorph (Polar Bear Cub)
+	[277787] = 'Interface\\Icons\\Inv_Pet_Direhorn',                 -- Polymorph (Direhorn)
+	[277792] = 'Interface\\Icons\\Inv_Bee_Default',                  -- Polymorph (Bumblebee)
 --	[82691]  = 'Interface\\Icons\\Spell_Frost_Ring Of Frost',        -- Ring of Frost
 	[51514]  = 'Interface\\Icons\\Spell_Shaman_Hex',                 -- Hex
 	[76780]  = 'Interface\\Icons\\Spell_Shaman_BindElemental',       -- Bind Elemental
@@ -34,7 +37,8 @@ SheepMonitor.trackableAuras = {
 	[10326]  = 'Interface\\Icons\\Spell_Holy_TurnUndead',            -- Turn Evil
 	[1098]   = 'Interface\\Icons\\Spell_Shadow_EnslaveDemon',        -- Enslave Demon
 	[339]    = 'Interface\\Icons\\Spell_Nature_StrangleVines',       -- Entangling Roots
-	[115078] = 'Interface\\Icons\\ability_monk_paralysis',           -- Paralysis
+	[115078] = 'Interface\\Icons\\Ability_Monk_Paralysis',           -- Paralysis
+	[217832] = 'Interface\\Icons\\Ability_DemonHunter_Imprison',     -- Imprison
 }
 
 

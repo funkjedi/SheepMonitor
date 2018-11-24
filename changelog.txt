@@ -1,3 +1,6 @@
+1.18
+- added support for Peacock, Bumblebee, Direhorn and Imprison
+
 1.17
 - updated for patch 8.0.1
 - adding integration with LibAuras
