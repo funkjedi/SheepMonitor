@@ -1,3 +1,6 @@
+1.19
+- updated for patch 8.2.0
+
 1.18
 - added support for Peacock, Bumblebee, Direhorn and Imprison
 

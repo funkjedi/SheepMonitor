@@ -17,7 +17,7 @@ local function setOption(key, value)
 end
 local function setOptionPreview(key, value)
 	SheepMonitor.db.char[key] = value
-	PlaySoundFile(value)
+	SheepMonitor:PlaySoundFile(value)
 end
 
 
@@ -237,4 +237,3 @@ function SheepMonitor:CreateInterfaceOptions()
 	audibleBreakWarningDesc:SetJustifyH('LEFT')
 	audibleBreakWarningDesc:SetJustifyV('MIDDLE')
 end
-

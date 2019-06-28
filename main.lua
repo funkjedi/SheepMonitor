@@ -132,7 +132,7 @@ function SheepMonitor:POLYMORPH_UPDATE(aura, remaining)
 		end
 	end
 	if self.db.char.enableAudibleBreakWarning and remaining == 5 then
-		PlaySoundFile(self.db.char.audibleBreakWarningSound)
+		self:PlaySoundFile(self.db.char.audibleBreakWarningSound)
 	end
 end
 
@@ -144,7 +144,7 @@ function SheepMonitor:POLYMORPH_REMOVED(aura)
 		self:HideQuartz(aura)
 	end
 	if self.db.char.enableAudibleBreak then
-		PlaySoundFile(self.db.char.audibleBreakSound)
+		self:PlaySoundFile(self.db.char.audibleBreakSound)
 	end
 	if self.db.char.enableBreakMessages then
 		local message = L['WARNING_BROKEN']:format(aura.spellName)
@@ -184,5 +184,13 @@ function SheepMonitor:SendAnnouncement(message)
 	end
 end
 
-
-
+function SheepMonitor:PlaySoundFile(file)
+	local sounds = {
+		['Sound\\Interface\\AlarmClockWarning3.wav'] = 567458,
+		['Sound\\Interface\\RaidWarning.wav'] = 567397,
+	}
+	if sounds[file] then
+		file = sounds[file]
+	end
+	PlaySoundFile(file)
+end
