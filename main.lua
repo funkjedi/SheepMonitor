@@ -45,6 +45,10 @@ function SheepMonitor:OnInitialize()
 	--InterfaceOptionsFrame_OpenToCategory('SheepMonitor')
 end
 
+function SheepMonitor:IsClassic()
+	return select(1, GetBuildInfo()) < '8.0.0'
+end
+
 function SheepMonitor:OnEnable()
 	self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 end
@@ -52,6 +56,11 @@ end
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = CombatLogGetCurrentEventInfo()
+	-- the classic always returns a spell id of zero so we
+	-- resolve the spell id using the spell name instead
+	if self:IsClassic() then
+		spellId = select(7, GetSpellInfo(spellName))
+	end
 	-- watch for polymorphed mobs
 	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and self.trackableAuras[spellId] then
 		if (self.db.char.monitorRaid and UnitInRaid(sourceName)) or sourceName == UnitName('player') then
@@ -67,7 +76,16 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				timestamp = GetTime(),
 				duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID),
 			}
-			if destGUID == UnitGUID('target') then
+			if self:IsClassic() then
+				local playerLevel = UnitLevel('player')
+				if spellId == 118 and playerLevel < 20 then
+					aura.duration = 20
+				elseif spellId == 118 and playerLevel < 40 then
+					aura.duration = 30
+				elseif spellId == 118 and playerLevel < 60 then
+					aura.duration = 40
+				end
+			elseif destGUID == UnitGUID('target') then
 				aura.duration = select(5, LibAuras:UnitAura('target', spellId, 'PLAYER|HARMFUL')) or 0
 			end
 			self:AuraApplied(aura)
@@ -185,10 +203,18 @@ function SheepMonitor:SendAnnouncement(message)
 end
 
 function SheepMonitor:PlaySoundFile(file)
-	local sounds = {
-		['Sound\\Interface\\AlarmClockWarning3.wav'] = 567458,
-		['Sound\\Interface\\RaidWarning.wav'] = 567397,
-	}
+	local sound
+	if self:IsClassic() then
+		sounds = {
+			['Sound\\Interface\\AlarmClockWarning3.wav'] = 'Sound\\Interface\\AlarmClockWarning3.ogg',
+			['Sound\\Interface\\RaidWarning.wav'] = 'Sound\\Interface\\RaidWarning.ogg',
+		}
+	else
+		sounds = {
+			['Sound\\Interface\\AlarmClockWarning3.wav'] = 567458,
+			['Sound\\Interface\\RaidWarning.wav'] = 567397,
+		}
+	end
 	if sounds[file] then
 		file = sounds[file]
 	end
