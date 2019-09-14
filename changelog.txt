@@ -1,3 +1,6 @@
+1.21
+- added support for Polymorph (Rank 2), Polymorph (Rank 3) and Polymorph (Rank 4)
+
 1.20
 - updated for classic (tested only with Polymorph but others should/may work)
 

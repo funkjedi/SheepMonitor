@@ -6,6 +6,9 @@ SheepMonitor.auras = {}
 -- theses are the cc auras that we track
 SheepMonitor.trackableAuras = {
 	[118]    = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph
+	[12824]  = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Rank 2)
+	[12825]  = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Rank 3)
+	[12826]  = 'Interface\\Icons\\Spell_Nature_Polymorph',           -- Polymorph (Rank 4)
 	[28272]  = 'Interface\\Icons\\Spell_Magic_PolymorphPig',         -- Polymorph (Pig)
 	[28271]  = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',        -- Polymorph (Turtle)
 	[61780]  = 'Interface\\Icons\\Achievement_WorldEvent_Thanksgiving', -- Polymorph (Turkey)
