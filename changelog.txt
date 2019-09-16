@@ -1,3 +1,6 @@
+1.22
+- use correct durations based on Polymorph rank
+
 1.21
 - added support for Polymorph (Rank 2), Polymorph (Rank 3) and Polymorph (Rank 4)
 

@@ -43,6 +43,14 @@ function SheepMonitor:OnInitialize()
 
 	self:CreateInterfaceOptions()
 	--InterfaceOptionsFrame_OpenToCategory('SheepMonitor')
+
+	if (self:IsClassic()) {
+		LibAuraInfo.auraInfo[118]   = '20;1'
+		LibAuraInfo.auraInfo[12824] = '30;1'
+		LibAuraInfo.auraInfo[12825] = '40;1'
+		LibAuraInfo.auraInfo[12826] = '50;1'
+		LibAuraInfo.auraInfo[28272] = '50;1'
+	}
 end
 
 function SheepMonitor:IsClassic()
@@ -76,16 +84,7 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 				timestamp = GetTime(),
 				duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID),
 			}
-			if self:IsClassic() then
-				local playerLevel = UnitLevel('player')
-				if spellId == 118 and playerLevel < 20 then
-					aura.duration = 20
-				elseif spellId == 118 and playerLevel < 40 then
-					aura.duration = 30
-				elseif spellId == 118 and playerLevel < 60 then
-					aura.duration = 40
-				end
-			elseif destGUID == UnitGUID('target') then
+			if not self:IsClassic() and destGUID == UnitGUID('target') then
 				aura.duration = select(5, LibAuras:UnitAura('target', spellId, 'PLAYER|HARMFUL')) or 0
 			end
 			self:AuraApplied(aura)
