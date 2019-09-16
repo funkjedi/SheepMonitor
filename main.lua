@@ -44,13 +44,13 @@ function SheepMonitor:OnInitialize()
 	self:CreateInterfaceOptions()
 	--InterfaceOptionsFrame_OpenToCategory('SheepMonitor')
 
-	if (self:IsClassic()) {
+	if (self:IsClassic()) then
 		LibAuraInfo.auraInfo[118]   = '20;1'
 		LibAuraInfo.auraInfo[12824] = '30;1'
 		LibAuraInfo.auraInfo[12825] = '40;1'
 		LibAuraInfo.auraInfo[12826] = '50;1'
 		LibAuraInfo.auraInfo[28272] = '50;1'
-	}
+	end
 end
 
 function SheepMonitor:IsClassic()
