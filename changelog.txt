@@ -1,3 +1,7 @@
+1.23
+- adding support for Mawrat
+- fix chat message warnings when in instance groups
+
 1.22
 - use correct durations based on Polymorph rank
 

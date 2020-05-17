@@ -69,6 +69,9 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 	if self:IsClassic() then
 		spellId = select(7, GetSpellInfo(spellName))
 	end
+--	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and sourceName == UnitName('player') then
+--		ATOM:Dump({ spellId = spellId, spellName = spellName })
+--	end
 	-- watch for polymorphed mobs
 	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and self.trackableAuras[spellId] then
 		if (self.db.char.monitorRaid and UnitInRaid(sourceName)) or sourceName == UnitName('player') then
@@ -189,10 +192,10 @@ end
 
 function SheepMonitor:SendAnnouncement(message)
 	local chatType = false
-	if IsInRaid() then
+	if GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE) > 0 then
+		chatType = "INSTANCE_CHAT"
+	elseif IsInRaid() then
 		chatType = "RAID"
-	elseif GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE) > 0 then
-		chatType = "BATTLEGROUND"
 	elseif IsInGroup() then
 		chatType = "PARTY"
 	end
