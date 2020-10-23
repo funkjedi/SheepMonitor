@@ -52,7 +52,7 @@ function SheepMonitor.Timer:New()
 	end
 
 	-- create a new timer
-	local timer = SheepMonitor.Timer:Bind(CreateFrame('Frame', nil, SheepMonitor.notifier))
+	local timer = SheepMonitor.Timer:Bind(CreateFrame('Frame', nil, SheepMonitor.notifier, BackdropTemplateMixin and 'BackdropTemplate' or nil))
 	timer:Hide()
 	timer:SetWidth(140)
 	timer:SetHeight(28)
