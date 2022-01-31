@@ -37,7 +37,7 @@ function SheepMonitor.Timer:New()
 
 	-- create our notifier frame if it hasn't been created already
 	if not SheepMonitor.notifier then
-		SheepMonitor.notifier = CreateFrame('Frame', nil, UIParent)
+		SheepMonitor.notifier = CreateFrame('Frame', 'SheepMonitorNotifier', UIParent)
 		if SheepMonitor.db.char.notifierFramePosition then
 			local point, _, relativePoint, xOffset, yOffset = unpack(SheepMonitor.db.char.notifierFramePosition)
 			SheepMonitor.notifier:ClearAllPoints()
@@ -51,8 +51,10 @@ function SheepMonitor.Timer:New()
 		SheepMonitor.notifier:SetClampedToScreen(true)
 	end
 
+	local name = 'SheepMonitorTimer' .. #timers
+
 	-- create a new timer
-	local timer = SheepMonitor.Timer:Bind(CreateFrame('Frame', nil, SheepMonitor.notifier, BackdropTemplateMixin and 'BackdropTemplate' or nil))
+	local timer = SheepMonitor.Timer:Bind(CreateFrame('Frame', name, SheepMonitor.notifier, BackdropTemplateMixin and 'BackdropTemplate' or nil))
 	timer:Hide()
 	timer:SetWidth(140)
 	timer:SetHeight(28)
@@ -74,14 +76,16 @@ function SheepMonitor.Timer:New()
 			bottom = 0
 		}
 	})
+
 	-- create our icon texture; default to the polymorph spell
-	timer.texture = timer:CreateTexture('ARTWORK')
+	timer.texture = timer:CreateTexture(name .. 'Icon', 'ARTWORK')
 	timer.texture:SetTexture('Interface\\Icons\\Spell_nature_polymorph')
 	timer.texture:SetSize(23, 23)
 	timer.texture:SetPoint('LEFT', 3, 0)
 	timer.texture:SetTexCoord(0.08,0.92,0.08,0.92)
+
 	-- create our status bar
-	timer.statusBar = CreateFrame('StatusBar', nil, timer, 'TextStatusBar')
+	timer.statusBar = CreateFrame('StatusBar', name .. 'StatusBar', timer, 'TextStatusBar')
 	timer.statusBar:SetWidth(110)
 	timer.statusBar:SetHeight(26)
 	timer.statusBar:SetPoint('BOTTOMLEFT', timer, 27, 1)
@@ -91,8 +95,9 @@ function SheepMonitor.Timer:New()
 	timer.statusBar:SetScript('OnHide', stopDragging)
 	timer.statusBar:SetScript('OnMouseUp', stopDragging)
 	timer.statusBar:SetScript('OnMouseDown', startDragging)
+
 	-- create our unit name label
-	timer.label = timer.statusBar:CreateFontString('ARTWORK', nil, 'GameFontHighlightSmall')
+	timer.label = timer.statusBar:CreateFontString(name .. 'Label', 'ARTWORK', 'GameFontHighlightSmall')
 	timer.label:SetPoint('TOP')
 	timer.label:SetPoint('BOTTOM')
 	timer.label:SetPoint('LEFT', 4, 0)
@@ -101,8 +106,9 @@ function SheepMonitor.Timer:New()
 	timer.label:SetWordWrap(true)
 	--timer.label:SetTextHeight(11)
 	timer.label:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 11)
+
 	-- create our timer text
-	timer.countdown = timer.statusBar:CreateFontString('ARTWORK', nil, 'GameFontNormal')
+	timer.countdown = timer.statusBar:CreateFontString(name .. 'Countdown', 'ARTWORK', 'GameFontNormal')
 	timer.countdown:SetPoint('TOP')
 	timer.countdown:SetPoint('BOTTOM')
 	timer.countdown:SetPoint('RIGHT', -4, 0)
