@@ -1,0 +1,9 @@
+{
+    "Lua.diagnostics.disable": [
+        "undefined-global"
+    ],
+    "Lua.workspace.ignoreDir": [
+        ".vscode",
+        "Libs"
+    ]
+}
