@@ -1,3 +1,5 @@
+local addonName, SheepMonitor = ...
+
 SheepMonitor.auras = {}
 
 -- LuaFormatter off

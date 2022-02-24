@@ -1,3 +1,5 @@
+local addonName, SheepMonitor = ...
+
 function SheepMonitor:ShowQuartz(aura)
     if aura and IsAddOnLoaded('Quartz') then
         local Mirror = LibStub('AceAddon-3.0'):GetAddon('Quartz3'):GetModule('Mirror')

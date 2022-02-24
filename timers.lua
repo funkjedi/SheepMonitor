@@ -1,7 +1,16 @@
+local addonName, SheepMonitor = ...
+
 SheepMonitor.Timer = LibStub('Classy-1.0'):New('Frame')
 SheepMonitor.Timer:Hide()
 
 local timers = {}
+
+local SHEEPMONITOR_FONT = [[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]]
+
+-- use default game font for non-English locales
+if not string.match(GetLocale(), '^en(US|GB)$') then
+    SHEEPMONITOR_FONT = [[Fonts\FRIZQT__.ttf]]
+end
 
 -- utility functions for making frames draggable
 local function startDragging(self, button)
@@ -103,7 +112,7 @@ function SheepMonitor.Timer:New()
     timer.label:SetJustifyH('LEFT')
     timer.label:SetWordWrap(true)
     -- timer.label:SetTextHeight(11)
-    timer.label:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 11)
+    timer.label:SetFont(SHEEPMONITOR_FONT, 11)
 
     -- create our timer text
     timer.countdown = timer.statusBar:CreateFontString(name .. 'Countdown', 'ARTWORK', 'GameFontNormal')
@@ -111,7 +120,7 @@ function SheepMonitor.Timer:New()
     timer.countdown:SetPoint('BOTTOM')
     timer.countdown:SetPoint('RIGHT', -4, 0)
     -- timer.countdown:SetTextHeight(13)
-    timer.countdown:SetFont('Interface\\AddOns\\SheepMonitor\\fonts\\DroidSansFallback.ttf', 13)
+    timer.countdown:SetFont(SHEEPMONITOR_FONT, 13)
 
     table.insert(timers, timer)
 

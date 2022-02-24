@@ -1,3 +1,5 @@
+local addonName, SheepMonitor = ...
+
 local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
 local wf = LibStub('LibWidgetFactory-1.0')
 
