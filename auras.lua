@@ -64,8 +64,7 @@ function SheepMonitor:AuraApplied(aura)
     table.insert(self.auras, aura)
     self:POLYMORPH_APPLIED(aura)
 
-    aura.timer = SheepMonitor.Timer:Get(aura) or SheepMonitor.Timer:New()
-    aura.timer:Start(aura)
+    aura.timer = SheepMonitor:StartAuraTimer(aura)
 end
 
 function SheepMonitor:AuraBroken(destGUID, breakerName, breakerReason)
@@ -98,7 +97,7 @@ function SheepMonitor:AuraRemoved(destGUID, spellId)
                 aura.timer:Stop()
             end
 
-            SheepMonitor.Timer:UpdateTimers()
+            SheepMonitor:UpdateAuraTimers()
         end, 0.1)
     end
 end

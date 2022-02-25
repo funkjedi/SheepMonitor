@@ -1,6 +1,7 @@
 1.25
 - updated for patch 9.2
 - fixed bug where names wouldn't always show
+- refactor to remove Classy-1.0 library
 
 1.24
 - updated for patch 9.0.1

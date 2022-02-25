@@ -1,79 +1,62 @@
 local addonName, SheepMonitor = ...
 
-SheepMonitor.Timer = LibStub('Classy-1.0'):New('Frame')
-SheepMonitor.Timer:Hide()
+local TimerMixin = {}
 
-local timers = {}
+local notifierFrame
+local timerInstances = {}
 
-local SHEEPMONITOR_FONT = [[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]]
+local fontFamily = [[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]]
 
 -- use default game font for non-English locales
-if not string.match(GetLocale(), '^en(US|GB)$') then
-    SHEEPMONITOR_FONT = [[Fonts\FRIZQT__.ttf]]
+if not string.match(GetLocale(), '^en') then
+    fontFamily = [[Fonts\FRIZQT__.ttf]]
 end
 
--- utility functions for making frames draggable
-local function startDragging(self, button)
-    if button == 'RightButton' and not self.isMoving then
-        SheepMonitor.notifier:StartMoving()
-        self.isMoving = true
+local function createNotifierFrame()
+    if notifierFrame then
+        return notifierFrame
     end
-end
 
-local function stopDragging(self, button)
-    if self.isMoving then
-        SheepMonitor.notifier:StopMovingOrSizing()
+    notifierFrame = CreateFrame('Frame', 'SheepMonitorNotifier', UIParent)
 
-        if self:IsVisible() then -- save our new position
-            local point, _, relativePoint, xOffset, yOffset = SheepMonitor.notifier:GetPoint()
-            SheepMonitor.db.char.notifierFramePosition = { point, _, relativePoint, xOffset, yOffset }
-        end
-
-        self.isMoving = false
+    if SheepMonitor.db.char.notifierFramePosition then
+        local point, _, relativePoint, xOffset, yOffset = unpack(SheepMonitor.db.char.notifierFramePosition)
+        notifierFrame:ClearAllPoints()
+        notifierFrame:SetPoint(point, UIParent, relativePoint, xOffset, yOffset)
+    else
+        notifierFrame:SetPoint('CENTER')
     end
+
+    notifierFrame:SetWidth(140)
+    notifierFrame:SetHeight(28)
+    notifierFrame:SetMovable(true)
+    notifierFrame:SetClampedToScreen(true)
+
+    return notifierFrame
 end
 
-function SheepMonitor.Timer:New()
-    -- look for a timer which can be recycled
+local function createAuraTimer()
+    -- look for a timer frame which can be recycled
     -- this is important since frames can't be deleted once created
-    for index, timer in ipairs(timers) do
+    for _, timer in ipairs(timerInstances) do
         if not timer.aura then
             return timer
         end
     end
 
-    -- create our notifier frame if it hasn't been created already
-    if not SheepMonitor.notifier then
-        SheepMonitor.notifier = CreateFrame('Frame', 'SheepMonitorNotifier', UIParent)
+    local frameName = 'SheepMonitorTimer' .. #timerInstances
+    local timer = CreateFrame('Frame', frameName, createNotifierFrame(), 'BackdropTemplate')
 
-        if SheepMonitor.db.char.notifierFramePosition then
-            local point, _, relativePoint, xOffset, yOffset = unpack(SheepMonitor.db.char.notifierFramePosition)
-            SheepMonitor.notifier:ClearAllPoints()
-            SheepMonitor.notifier:SetPoint(point, UIParent, relativePoint, xOffset, yOffset)
-        else
-            SheepMonitor.notifier:SetPoint('CENTER')
-        end
-
-        SheepMonitor.notifier:SetWidth(140)
-        SheepMonitor.notifier:SetHeight(28)
-        SheepMonitor.notifier:SetMovable(true)
-        SheepMonitor.notifier:SetClampedToScreen(true)
-    end
-
-    local name = 'SheepMonitorTimer' .. #timers
-
-    -- create a new timer
-    local timer = SheepMonitor.Timer:Bind(CreateFrame('Frame', name, SheepMonitor.notifier,
-        BackdropTemplateMixin and 'BackdropTemplate' or nil))
+    Mixin(timer, TimerMixin)
 
     timer:Hide()
     timer:SetWidth(140)
     timer:SetHeight(28)
     timer:SetPoint('CENTER')
     timer:EnableMouse(true)
-    timer:SetScript('OnHide', stopDragging)
-    timer:SetScript('OnMouseUp', stopDragging)
-    timer:SetScript('OnMouseDown', startDragging)
+    timer:SetScript('OnHide', timer.StopDragging)
+    timer:SetScript('OnMouseDown', timer.StartDragging)
+    timer:SetScript('OnMouseUp', timer.StopDragging)
 
     timer:SetBackdrop({
         bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
@@ -85,57 +68,67 @@ function SheepMonitor.Timer:New()
     })
 
     -- create our icon texture; default to the polymorph spell
-    timer.texture = timer:CreateTexture(name .. 'Icon', 'ARTWORK')
-    timer.texture:SetTexture('Interface\\Icons\\Spell_nature_polymorph')
-    timer.texture:SetSize(23, 23)
-    timer.texture:SetPoint('LEFT', 3, 0)
-    timer.texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    local texture = timer:CreateTexture(frameName .. 'Icon', 'ARTWORK')
+    texture:SetTexture('Interface\\Icons\\Spell_nature_polymorph')
+    texture:SetSize(23, 23)
+    texture:SetPoint('LEFT', 3, 0)
+    texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 
     -- create our status bar
-    timer.statusBar = CreateFrame('StatusBar', name .. 'StatusBar', timer, 'TextStatusBar')
-    timer.statusBar:SetWidth(110)
-    timer.statusBar:SetHeight(26)
-    timer.statusBar:SetPoint('BOTTOMLEFT', timer, 27, 1)
-    timer.statusBar:SetStatusBarTexture('Interface\\TargetingFrame\\UI-StatusBar')
-    timer.statusBar:SetStatusBarColor(1, 0, 0)
-    timer.statusBar:EnableMouse(true)
-    timer.statusBar:SetScript('OnHide', stopDragging)
-    timer.statusBar:SetScript('OnMouseUp', stopDragging)
-    timer.statusBar:SetScript('OnMouseDown', startDragging)
+    local statusBar = CreateFrame('StatusBar', frameName .. 'StatusBar', timer, 'TextStatusBar')
+    statusBar:SetWidth(110)
+    statusBar:SetHeight(26)
+    statusBar:SetPoint('BOTTOMLEFT', timer, 27, 1)
+    statusBar:SetStatusBarTexture('Interface\\TargetingFrame\\UI-StatusBar')
+    statusBar:SetStatusBarColor(1, 0, 0)
 
     -- create our unit name label
-    timer.label = timer.statusBar:CreateFontString(name .. 'Label', 'ARTWORK', 'GameFontHighlightSmall')
-    timer.label:SetPoint('TOP')
-    timer.label:SetPoint('BOTTOM')
-    timer.label:SetPoint('LEFT', 4, 0)
-    timer.label:SetPoint('RIGHT', -26, 0)
-    timer.label:SetJustifyH('LEFT')
-    timer.label:SetWordWrap(true)
-    -- timer.label:SetTextHeight(11)
-    timer.label:SetFont(SHEEPMONITOR_FONT, 11)
+    local label = statusBar:CreateFontString(frameName .. 'Label', 'ARTWORK', 'GameFontHighlightSmall')
+    label:SetPoint('TOP')
+    label:SetPoint('BOTTOM')
+    label:SetPoint('LEFT', 4, 0)
+    label:SetPoint('RIGHT', -26, 0)
+    label:SetJustifyH('LEFT')
+    label:SetWordWrap(true)
+    label:SetFont(fontFamily, 11)
 
     -- create our timer text
-    timer.countdown = timer.statusBar:CreateFontString(name .. 'Countdown', 'ARTWORK', 'GameFontNormal')
-    timer.countdown:SetPoint('TOP')
-    timer.countdown:SetPoint('BOTTOM')
-    timer.countdown:SetPoint('RIGHT', -4, 0)
-    -- timer.countdown:SetTextHeight(13)
-    timer.countdown:SetFont(SHEEPMONITOR_FONT, 13)
+    local countdown = statusBar:CreateFontString(frameName .. 'Countdown', 'ARTWORK', 'GameFontNormal')
+    countdown:SetPoint('TOP')
+    countdown:SetPoint('BOTTOM')
+    countdown:SetPoint('RIGHT', -4, 0)
+    countdown:SetFont(fontFamily, 13)
 
-    table.insert(timers, timer)
+    timer.countdown = countdown
+    timer.label = label
+    timer.statusBar = statusBar
+    timer.texture = texture
 
-    return timer, #timers
+    table.insert(timerInstances, timer)
+
+    return timer, #timerInstances
 end
 
-function SheepMonitor.Timer:Get(aura)
-    for index, timer in ipairs(timers) do
-        if timer.aura and timer.aura.auraGUID == aura.auraGUID then
-            return timer, index
+function TimerMixin:StartDragging(button)
+    if button == 'RightButton' and not self.isMoving then
+        self.isMoving = true
+        notifierFrame:StartMoving()
+    end
+end
+
+function TimerMixin:StopDragging(button)
+    if self.isMoving then
+        self.isMoving = false
+        notifierFrame:StopMovingOrSizing()
+
+        if self:IsVisible() then -- save our new position
+            local point, _, relativePoint, xOffset, yOffset = notifierFrame:GetPoint()
+            SheepMonitor.db.char.notifierFramePosition = { point, _, relativePoint, xOffset, yOffset }
         end
     end
 end
 
-function SheepMonitor.Timer:Start(aura)
+function TimerMixin:Start(aura)
     if self.aura then
         self:Stop()
     end
@@ -143,30 +136,33 @@ function SheepMonitor.Timer:Start(aura)
     self.aura = aura
 
     if SheepMonitor.db.char.enableNotifier then
+        self.label:SetFont(fontFamily, 11)
         self.label:SetText(aura.destName)
         self.texture:SetTexture(aura.texture)
         self.statusBar:SetMinMaxValues(0, aura.duration)
         self.statusBar:SetValue(aura.duration)
         self.countdown:SetText(aura.duration)
-        self:UpdateTimers()
+        SheepMonitor:UpdateAuraTimers()
     end
 
     self:ScheduleRepeatingTimers()
+
+    return self
 end
 
-function SheepMonitor.Timer:Stop()
+function TimerMixin:Stop()
     self:CancelRepeatingTimers()
     self:Hide()
     self.aura = nil
-    self:UpdateTimers()
+    SheepMonitor:UpdateAuraTimers()
 end
 
-function SheepMonitor.Timer:GetRemaining(raw)
+function TimerMixin:GetRemaining(raw)
     local remaining = self.aura.duration - (GetTime() - self.aura.timestamp)
     return raw and remaining or floor(remaining)
 end
 
-function SheepMonitor.Timer:ScheduleRepeatingTimers()
+function TimerMixin:ScheduleRepeatingTimers()
     local onFinished = function(timer)
         local remaining = timer:GetRemaining()
 
@@ -193,12 +189,12 @@ function SheepMonitor.Timer:ScheduleRepeatingTimers()
     end
 end
 
-function SheepMonitor.Timer:CancelRepeatingTimers()
+function TimerMixin:CancelRepeatingTimers()
     SheepMonitor:CancelTimer(self.onFinishedTimer, true)
     SheepMonitor:CancelTimer(self.onUpdateTimer, true)
 end
 
-function SheepMonitor.Timer:OnFinished(remaining)
+function TimerMixin:OnFinished(remaining)
     SheepMonitor:POLYMORPH_UPDATE(self.aura, remaining)
 
     if self:IsVisible() then
@@ -206,12 +202,22 @@ function SheepMonitor.Timer:OnFinished(remaining)
     end
 end
 
-function SheepMonitor.Timer:OnUpdate(remaining)
+function TimerMixin:OnUpdate(remaining)
     self.statusBar:SetValue(remaining)
 end
 
-function SheepMonitor.Timer:UpdateTimers()
-    local lastBar = SheepMonitor.notifier
+function SheepMonitor:StartAuraTimer(aura)
+    for _, timer in ipairs(timerInstances) do
+        if timer.aura and timer.aura.auraGUID == aura.auraGUID then
+            return timer:Start(aura)
+        end
+    end
+
+    return createAuraTimer():Start(aura)
+end
+
+function SheepMonitor:UpdateAuraTimers()
+    local lastBar = notifierFrame
     local from, to = 'BOTTOM', 'TOP'
 
     if not SheepMonitor.db.char.growUpwards then
@@ -219,23 +225,23 @@ function SheepMonitor.Timer:UpdateTimers()
         to = 'BOTTOM'
     end
 
-    for i = 1, #timers do
-        if timers[i].aura then
-            local origTo = to
+    for _, timer in ipairs(timerInstances) do
+        if timer.aura then
+            local originalTo = to
 
-            if lastBar == SheepMonitor.notifier then
+            if lastBar == notifierFrame then
                 to = from
             end
 
-            timers[i]:ClearAllPoints()
-            timers[i]:Show()
-            timers[i]:SetPoint(from .. 'LEFT', lastBar, to .. 'LEFT', 0, 0)
-            timers[i]:SetPoint(from .. 'RIGHT', lastBar, to .. 'RIGHT', 0, 0)
+            timer:ClearAllPoints()
+            timer:Show()
+            timer:SetPoint(from .. 'LEFT', lastBar, to .. 'LEFT', 0, 0)
+            timer:SetPoint(from .. 'RIGHT', lastBar, to .. 'RIGHT', 0, 0)
 
-            lastBar = timers[i]
-            to = origTo
+            lastBar = timer
+            to = originalTo
         else
-            timers[i]:Hide()
+            timer:Hide()
         end
     end
 end
@@ -255,6 +261,5 @@ function SheepMonitor:CreateTestTimer(duration)
         duration = duration or 30,
     }
 
-    aura.timer = SheepMonitor.Timer:Get(aura) or SheepMonitor.Timer:New()
-    aura.timer:Start(aura)
+    aura.timer = SheepMonitor:StartAuraTimer(aura)
 end

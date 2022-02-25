@@ -10,5 +10,4 @@
     <Script file="libs\LibAuras\LibAuras.lua"/>
     <Include file="libs\LibAuraInfo-1.0\LibAuraInfo-1.0\lib.xml"/>
     <Include file="libs\LibWidgetFactory-1.0\LibWidgetFactory-1.0.xml"/>
-    <Script file="libs\Classy-1.0\Classy-1.0.lua"/>
 </Ui>

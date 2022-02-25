@@ -2,6 +2,8 @@ local addonName, SheepMonitor = ...
 
 SheepMonitor = LibStub('AceAddon-3.0'):NewAddon(SheepMonitor, addonName, 'AceEvent-3.0', 'AceTimer-3.0')
 
+_G['SheepMonitor'] = SheepMonitor
+
 local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
 
 local LibAuraInfo = LibStub('LibAuraInfo-1.0')
