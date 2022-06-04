@@ -1,4 +1,4 @@
-## Interface: 90200
+## Interface: 90205
 ## Title: Sheep Monitor
 ## Notes: Provides various methods of notification to help you keep track of your flock.
 ## Author: funkjedi
