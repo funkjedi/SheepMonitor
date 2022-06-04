@@ -5,6 +5,9 @@
 ## Version: 1.25
 ## SavedVariables: SheepMonitorDatabase
 ## OptionalDeps: Ace3, LibAuras, LibAuraInfo-1.0
+## X-Curse-Project-ID: 28218
+## X-WoWI-ID: 19050
+## X-Wago-ID: vEGP1RN1
 
 embeds.xml
 localization\localization.enUS.lua

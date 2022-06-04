@@ -44,7 +44,7 @@ local function createAuraTimer()
         end
     end
 
-    local frameName = 'SheepMonitorTimer' .. #timerInstances
+    local frameName = 'SheepMonitorTimer' .. (#timerInstances + 1)
     local timer = CreateFrame('Frame', frameName, createNotifierFrame(), 'BackdropTemplate')
 
     Mixin(timer, TimerMixin)
@@ -83,7 +83,7 @@ local function createAuraTimer()
     statusBar:SetStatusBarColor(1, 0, 0)
 
     -- create our unit name label
-    local label = statusBar:CreateFontString(frameName .. 'Label', 'ARTWORK', 'GameFontHighlightSmall')
+    local label = statusBar:CreateFontString(frameName .. 'StatusBarLabel', 'ARTWORK', 'GameFontHighlightSmall')
     label:SetPoint('TOP')
     label:SetPoint('BOTTOM')
     label:SetPoint('LEFT', 4, 0)
@@ -93,7 +93,7 @@ local function createAuraTimer()
     label:SetFont(fontFamily, 11)
 
     -- create our timer text
-    local countdown = statusBar:CreateFontString(frameName .. 'Countdown', 'ARTWORK', 'GameFontNormal')
+    local countdown = statusBar:CreateFontString(frameName .. 'StatusBarCountdown', 'ARTWORK', 'GameFontNormal')
     countdown:SetPoint('TOP')
     countdown:SetPoint('BOTTOM')
     countdown:SetPoint('RIGHT', -4, 0)
@@ -136,7 +136,6 @@ function TimerMixin:Start(aura)
     self.aura = aura
 
     if SheepMonitor.db.char.enableNotifier then
-        self.label:SetFont(fontFamily, 11)
         self.label:SetText(aura.destName)
         self.texture:SetTexture(aura.texture)
         self.statusBar:SetMinMaxValues(0, aura.duration)
