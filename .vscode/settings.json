@@ -1,9 +1,18 @@
 {
     "Lua.diagnostics.disable": [
-        "undefined-global"
+        //"undefined-global"
+    ],
+    "Lua.diagnostics.globals": [
+        "ChatTypeInfo",
+        "InterfaceOptions_AddCategory",
+        "InterfaceOptionsFrame",
+        "LE_PARTY_CATEGORY_INSTANCE",
+        "OmniCC",
+        "RaidBossEmoteFrame",
+        "RaidNotice_AddMessage",
     ],
     "Lua.workspace.ignoreDir": [
         ".vscode",
-        "Libs"
+        "libs",
     ]
 }

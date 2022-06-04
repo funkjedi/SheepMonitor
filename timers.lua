@@ -54,9 +54,12 @@ local function createAuraTimer()
     timer:SetHeight(28)
     timer:SetPoint('CENTER')
     timer:EnableMouse(true)
+
+    ---@diagnostic disable
     timer:SetScript('OnHide', timer.StopDragging)
     timer:SetScript('OnMouseDown', timer.StartDragging)
     timer:SetScript('OnMouseUp', timer.StopDragging)
+    ---@diagnostic enable
 
     timer:SetBackdrop({
         bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
@@ -89,7 +92,7 @@ local function createAuraTimer()
     label:SetPoint('LEFT', 4, 0)
     label:SetPoint('RIGHT', -26, 0)
     label:SetJustifyH('LEFT')
-    label:SetWordWrap(true)
+    label:SetWordWrap(true) ---@diagnostic disable-line
     label:SetFont(fontFamily, 11)
 
     -- create our timer text
@@ -212,7 +215,7 @@ function SheepMonitor:StartAuraTimer(aura)
         end
     end
 
-    return createAuraTimer():Start(aura)
+    return createAuraTimer():Start(aura) ---@diagnostic disable-line
 end
 
 function SheepMonitor:UpdateAuraTimers()
