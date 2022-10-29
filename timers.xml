@@ -1,0 +1,65 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+  <Script file="timers.lua"/>
+
+  <Frame name="SheepMonitorTimerTemplate" inherits="BackdropTemplate" mixin="SheepMonitorTimerMixin" virtual="true" enableMouse="true" hidden="true">
+    <Size x="140" y="28"/>
+    <Anchors>
+      <Anchor point="CENTER" x="0" y="0"/>
+    </Anchors>
+    <KeyValues>
+      <KeyValue key="backdropInfo" value="BACKDROP_SHEEPMONITOR_TIMER_32_1" type="global"/>
+    </KeyValues>
+    <Scripts>
+      <OnHide method="StopDragging"/>
+      <OnMouseDown method="StartDragging"/>
+      <OnMouseUp method="StopDragging"/>
+    </Scripts>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture parentKey="Icon" file="Interface\Icons\Spell_nature_polymorph">
+          <Size x="23" y="23"/>
+          <TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92"/>
+          <Anchors>
+            <Anchor point="LEFT" x="3" y="0"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Frames>
+      <StatusBar parentKey="StatusBar" inherits="TextStatusBar">
+        <Size x="110" y="26"/>
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" relativeKey="$parent" x="27" y="1"/>
+        </Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <FontString parentKey="Label" inherits="GameFontHighlightSmall" justifyH="LEFT" wordwrap="true">
+              <Anchors>
+                <Anchor point="TOP"/>
+                <Anchor point="BOTTOM"/>
+                <Anchor point="LEFT" x="4" y="0"/>
+                <Anchor point="RIGHT" x="-26" y="0"/>
+              </Anchors>
+              <Color r="1.0" g="1.0" b="1.0"/>
+              <FontHeight val="11"/>
+            </FontString>
+            <FontString parentKey="Countdown" inherits="GameFontNormal">
+              <Anchors>
+                <Anchor point="TOP"/>
+                <Anchor point="BOTTOM"/>
+                <Anchor point="RIGHT" x="-4" y="0"/>
+              </Anchors>
+              <Color r="1.0" g="0.82" b="0"/>
+              <FontHeight val="13"/>
+            </FontString>
+          </Layer>
+        </Layers>
+        <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+        <BarColor r="1.0" g="0" b="0"/>
+      </StatusBar>
+    </Frames>
+  </Frame>
+
+</Ui>

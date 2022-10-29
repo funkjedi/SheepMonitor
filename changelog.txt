@@ -1,3 +1,8 @@
+1.26
+- updated for patch 10.0
+- moved frame definition into XML
+- added support for Mass Polymorph
+
 1.25
 - updated for patch 9.2
 - fixed bug where names wouldn't always show

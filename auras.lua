@@ -23,6 +23,7 @@ SheepMonitor.trackableAuras = {
     [61025]  = 'Interface\\Icons\\Spell_Nature_GuardianWard',           -- Polymorph (Serpent)
     [61780]  = 'Interface\\Icons\\Achievement_WorldEvent_Thanksgiving', -- Polymorph (Turkey)
     [28271]  = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',           -- Polymorph (Turtle)
+    [383121] = 'Interface\\Icons\\Spell_Nature_DoublePolymorph1',       -- Mass Polymorph
 --    [219393] = 'Interface\\Icons\\Spell_Nature_Polymorph',              -- [Crittermorph] Polymorph
 --    [219407] = 'Interface\\Icons\\Achievement_Halloween_Cat_01',        -- [Crittermorph] Polymorph (Black Cat)
 --    [277793] = 'Interface\\Icons\\Inv_Bee_Default',                     -- [Crittermorph] Polymorph (Bumblebee)
@@ -31,7 +32,6 @@ SheepMonitor.trackableAuras = {
 --    [219403] = 'Interface\\Icons\\Spell_Magic_PolymorphPig',            -- [Crittermorph] Polymorph (Pig)
 --    [219401] = 'Interface\\Icons\\Inv_Pet_Porcupine',                   -- [Crittermorph] Polymorph (Porcupine)
 --    [219398] = 'Interface\\Icons\\Ability_Hunter_Pet_Turtle',           -- [Crittermorph] Polymorph (Turtle)
-
     [51514]  = 'Interface\\Icons\\Spell_Shaman_Hex',                 -- Hex
     [76780]  = 'Interface\\Icons\\Spell_Shaman_BindElemental',       -- Bind Elemental
     [9484]   = 'Interface\\Icons\\Spell_Nature_Slow',                -- Shackle Undead

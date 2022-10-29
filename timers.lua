@@ -1,15 +1,23 @@
 local addonName, SheepMonitor = ...
 
-local TimerMixin = {}
-
 local notifierFrame
 local timerInstances = {}
 
-local fontFamily = [[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]]
+SheepMonitorTimerMixin = {}
 
--- use default game font for non-English locales
+BACKDROP_SHEEPMONITOR_TIMER_32_1 = {
+    bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
+    edgeFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
+    tile = true,
+    tileSize = 32,
+    edgeSize = 1,
+    insets = { left = 0, right = 0, top = 0, bottom = 0 },
+}
+
+SHEEPMONITOR_TEXT_FONT = [[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]]
+
 if not string.match(GetLocale(), '^en') then
-    fontFamily = [[Fonts\FRIZQT__.ttf]]
+    SHEEPMONITOR_TEXT_FONT = STANDARD_TEXT_FONT
 end
 
 local function createNotifierFrame()
@@ -45,81 +53,24 @@ local function createAuraTimer()
     end
 
     local frameName = 'SheepMonitorTimer' .. (#timerInstances + 1)
-    local timer = CreateFrame('Frame', frameName, createNotifierFrame(), 'BackdropTemplate')
+    local timer = CreateFrame('Frame', frameName, createNotifierFrame(), 'SheepMonitorTimerTemplate')
 
-    Mixin(timer, TimerMixin)
-
-    timer:Hide()
-    timer:SetWidth(140)
-    timer:SetHeight(28)
-    timer:SetPoint('CENTER')
-    timer:EnableMouse(true)
-
-    ---@diagnostic disable
-    timer:SetScript('OnHide', timer.StopDragging)
-    timer:SetScript('OnMouseDown', timer.StartDragging)
-    timer:SetScript('OnMouseUp', timer.StopDragging)
-    ---@diagnostic enable
-
-    timer:SetBackdrop({
-        bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
-        edgeFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
-        tile = true,
-        tileSize = 32,
-        edgeSize = 1,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 },
-    })
-
-    -- create our icon texture; default to the polymorph spell
-    local texture = timer:CreateTexture(frameName .. 'Icon', 'ARTWORK')
-    texture:SetTexture('Interface\\Icons\\Spell_nature_polymorph')
-    texture:SetSize(23, 23)
-    texture:SetPoint('LEFT', 3, 0)
-    texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-
-    -- create our status bar
-    local statusBar = CreateFrame('StatusBar', frameName .. 'StatusBar', timer, 'TextStatusBar')
-    statusBar:SetWidth(110)
-    statusBar:SetHeight(26)
-    statusBar:SetPoint('BOTTOMLEFT', timer, 27, 1)
-    statusBar:SetStatusBarTexture('Interface\\TargetingFrame\\UI-StatusBar')
-    statusBar:SetStatusBarColor(1, 0, 0)
-
-    -- create our unit name label
-    local label = statusBar:CreateFontString(frameName .. 'StatusBarLabel', 'ARTWORK', 'GameFontHighlightSmall')
-    label:SetPoint('TOP')
-    label:SetPoint('BOTTOM')
-    label:SetPoint('LEFT', 4, 0)
-    label:SetPoint('RIGHT', -26, 0)
-    label:SetJustifyH('LEFT')
-    label:SetWordWrap(true) ---@diagnostic disable-line
-    label:SetFont(fontFamily, 11)
-
-    -- create our timer text
-    local countdown = statusBar:CreateFontString(frameName .. 'StatusBarCountdown', 'ARTWORK', 'GameFontNormal')
-    countdown:SetPoint('TOP')
-    countdown:SetPoint('BOTTOM')
-    countdown:SetPoint('RIGHT', -4, 0)
-    countdown:SetFont(fontFamily, 13)
-
-    timer.countdown = countdown
-    timer.label = label
-    timer.statusBar = statusBar
-    timer.texture = texture
+    timer.StatusBar.Label:SetFont([[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]], 11)
+    timer.StatusBar.Countdown:SetFont([[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]], 13)
 
     table.insert(timerInstances, timer)
 
     return timer, #timerInstances
 end
 
-function TimerMixin:StartDragging(button)
+function SheepMonitorTimerMixin:StartDragging(button)
     if button == 'RightButton' and not self.isMoving then
         self.isMoving = true
         notifierFrame:StartMoving()
     end
 end
 
-function TimerMixin:StopDragging(button)
+function SheepMonitorTimerMixin:StopDragging(button)
     if self.isMoving then
         self.isMoving = false
         notifierFrame:StopMovingOrSizing()
@@ -131,7 +82,7 @@ function TimerMixin:StopDragging(button)
     end
 end
 
-function TimerMixin:Start(aura)
+function SheepMonitorTimerMixin:Start(aura)
     if self.aura then
         self:Stop()
     end
@@ -139,11 +90,11 @@ function TimerMixin:Start(aura)
     self.aura = aura
 
     if SheepMonitor.db.char.enableNotifier then
-        self.label:SetText(aura.destName)
-        self.texture:SetTexture(aura.texture)
-        self.statusBar:SetMinMaxValues(0, aura.duration)
-        self.statusBar:SetValue(aura.duration)
-        self.countdown:SetText(aura.duration)
+        self.Icon:SetTexture(aura.texture)
+        self.StatusBar:SetMinMaxValues(0, aura.duration)
+        self.StatusBar:SetValue(aura.duration)
+        self.StatusBar.Countdown:SetText(aura.duration)
+        self.StatusBar.Label:SetText(aura.destName)
         SheepMonitor:UpdateAuraTimers()
     end
 
@@ -152,19 +103,19 @@ function TimerMixin:Start(aura)
     return self
 end
 
-function TimerMixin:Stop()
+function SheepMonitorTimerMixin:Stop()
     self:CancelRepeatingTimers()
     self:Hide()
     self.aura = nil
     SheepMonitor:UpdateAuraTimers()
 end
 
-function TimerMixin:GetRemaining(raw)
+function SheepMonitorTimerMixin:GetRemaining(raw)
     local remaining = self.aura.duration - (GetTime() - self.aura.timestamp)
     return raw and remaining or floor(remaining)
 end
 
-function TimerMixin:ScheduleRepeatingTimers()
+function SheepMonitorTimerMixin:ScheduleRepeatingTimers()
     local onFinished = function(timer)
         local remaining = timer:GetRemaining()
 
@@ -191,21 +142,21 @@ function TimerMixin:ScheduleRepeatingTimers()
     end
 end
 
-function TimerMixin:CancelRepeatingTimers()
+function SheepMonitorTimerMixin:CancelRepeatingTimers()
     SheepMonitor:CancelTimer(self.onFinishedTimer, true)
     SheepMonitor:CancelTimer(self.onUpdateTimer, true)
 end
 
-function TimerMixin:OnFinished(remaining)
+function SheepMonitorTimerMixin:OnFinished(remaining)
     SheepMonitor:POLYMORPH_UPDATE(self.aura, remaining)
 
     if self:IsVisible() then
-        self.countdown:SetText(remaining)
+        self.StatusBar.Countdown:SetText(remaining)
     end
 end
 
-function TimerMixin:OnUpdate(remaining)
-    self.statusBar:SetValue(remaining)
+function SheepMonitorTimerMixin:OnUpdate(remaining)
+    self.StatusBar:SetValue(remaining)
 end
 
 function SheepMonitor:StartAuraTimer(aura)

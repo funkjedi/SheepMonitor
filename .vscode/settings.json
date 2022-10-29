@@ -1,4 +1,8 @@
 {
+    "[xml]": {
+        "editor.formatOnSave": false,
+    },
+    "editor.formatOnSave": true,
     "Lua.diagnostics.disable": [
         //"undefined-global"
     ],

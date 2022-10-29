@@ -1,8 +1,8 @@
-## Interface: 90205
+## Interface: 100000
 ## Title: Sheep Monitor
 ## Notes: Provides various methods of notification to help you keep track of your flock.
 ## Author: funkjedi
-## Version: 1.25
+## Version: 1.26
 ## SavedVariables: SheepMonitorDatabase
 ## OptionalDeps: Ace3, LibAuras, LibAuraInfo-1.0
 ## X-Curse-Project-ID: 28218
@@ -17,6 +17,6 @@ localization\localization.ruRU.lua
 localization\localization.zhTW.lua
 main.lua
 auras.lua
-timers.lua
+timers.xml
 integrations.lua
 options.lua
