@@ -6,7 +6,8 @@ local wf = LibStub('LibWidgetFactory-1.0')
 local frame = CreateFrame('Frame', nil, InterfaceOptionsFrame)
 frame.name = 'SheepMonitor'
 
-InterfaceOptions_AddCategory(frame)
+local category = Settings.RegisterCanvasLayoutCategory(frame, frame.name)
+Settings.RegisterAddOnCategory(category)
 
 -- generic getter and setter functions for our notifier
 local function getOption(key)
