@@ -61,7 +61,7 @@ function SheepMonitor:OnInitialize()
 end
 
 function SheepMonitor:IsClassic()
-    return select(1, GetBuildInfo()) < '8.0.0'
+    return WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE
 end
 
 function SheepMonitor:OnEnable()
