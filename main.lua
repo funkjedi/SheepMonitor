@@ -1,31 +1,29 @@
 local addonName, SheepMonitor = ...
 
-SheepMonitor = LibStub('AceAddon-3.0'):NewAddon(SheepMonitor, addonName, 'AceEvent-3.0', 'AceTimer-3.0')
+SheepMonitor                  = LibStub('AceAddon-3.0'):NewAddon(SheepMonitor, addonName, 'AceEvent-3.0', 'AceTimer-3.0')
 
-_G['SheepMonitor'] = SheepMonitor
+_G['SheepMonitor']            = SheepMonitor
 
-local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
+local L                       = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
 
-local LibAuraInfo = LibStub('LibAuraInfo-1.0')
+local LibAuraInfo             = LibStub('LibAuraInfo-1.0')
 
 -- LuaFormatter off
-LibAuraInfo.auraInfo[118]    = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[28271]  = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[28272]  = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[61305]  = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[61721]  = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[61780]  = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[126819] = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[161353] = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[161354] = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[161355] = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[161372] = '60;1' -- updating polymorph value for BFA
-LibAuraInfo.auraInfo[383121] = '60;1' -- adding mass polymorph
-LibAuraInfo.auraInfo[3355]   = '60;1' -- fixing incorrect value
-LibAuraInfo.auraInfo[115078] = '40;1' -- adding ability_monk_paralysis
+LibAuraInfo.auraInfo[118]     = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[28271]   = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[28272]   = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[61305]   = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[61721]   = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[61780]   = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[126819]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[161353]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[161354]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[161355]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[161372]  = '60;1' -- updating polymorph value for BFA
+LibAuraInfo.auraInfo[383121]  = '60;1' -- adding mass polymorph
+LibAuraInfo.auraInfo[3355]    = '60;1' -- fixing incorrect value
+LibAuraInfo.auraInfo[115078]  = '40;1' -- adding ability_monk_paralysis
 -- LuaFormatter on
-
-local LibAuras = LibStub:GetLibrary('LibAuras')
 
 function SheepMonitor:OnInitialize()
     self.db = LibStub('AceDB-3.0'):New('SheepMonitorDatabase', {
@@ -70,7 +68,7 @@ end
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
     local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2,
-        spellId, spellName, spellSchool = CombatLogGetCurrentEventInfo()
+    spellId, spellName, spellSchool = CombatLogGetCurrentEventInfo()
 
     -- the classic always returns a spell id of zero so we
     -- resolve the spell id using the spell name instead
@@ -99,7 +97,8 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
             }
 
             if not self:IsClassic() and destGUID == UnitGUID('target') then
-                aura.duration = select(5, LibAuras:UnitAura('target', spellId, 'PLAYER|HARMFUL')) or 0
+                local auraInfo = AuraUtil.FindAuraByName(spellName, 'target', 'PLAYER|HARMFUL')
+                aura.duration = auraInfo and auraInfo.duration or aura.duration
             end
 
             self:AuraApplied(aura)

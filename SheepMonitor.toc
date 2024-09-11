@@ -2,9 +2,9 @@
 ## Title: Sheep Monitor
 ## Notes: Provides various methods of notification to help you keep track of your flock.
 ## Author: funkjedi
-## Version: 1.28
+## Version: 1.29
 ## SavedVariables: SheepMonitorDatabase
-## OptionalDeps: Ace3, LibAuras, LibAuraInfo-1.0
+## OptionalDeps: Ace3, LibAuraInfo-1.0
 ## X-Curse-Project-ID: 28218
 ## X-WoWI-ID: 19050
 ## X-Wago-ID: vEGP1RN1

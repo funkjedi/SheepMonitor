@@ -1,3 +1,6 @@
+1.29
+- remove LibAuras dep
+
 1.28
 - fix check for classic
 
