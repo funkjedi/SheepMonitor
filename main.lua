@@ -56,10 +56,19 @@ function SheepMonitor:OnInitialize()
         LibAuraInfo.auraInfo[12826] = '50;1'
         LibAuraInfo.auraInfo[28272] = '50;1'
     end
+
+    if (self:IsCata()) then
+        LibAuraInfo.auraInfo[118] = '50;1'
+        LibAuraInfo.auraInfo[28272] = '50;1'
+    end
 end
 
 function SheepMonitor:IsClassic()
     return WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE
+end
+
+function SheepMonitor:IsCata()
+    return WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 end
 
 function SheepMonitor:OnEnable()
