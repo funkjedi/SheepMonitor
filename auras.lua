@@ -14,6 +14,7 @@ SheepMonitor.trackableAuras = {
     [277787] = 'Interface\\Icons\\Inv_Pet_Direhorn',                    -- Polymorph (Direhorn)
     [321395] = 'Interface\\Icons\\Inv_RatMount',                        -- Polymorph (Mawrat)
     [161354] = 'Interface\\Icons\\Ability_Hunter_AspectOfTheMonkey',    -- Polymorph (Monkey)
+    [460392] = 'Interface\\Icons\\inv_collections_armor_flowerbracelet_a_01',  -- Polymorph (Mosswool)
     [161372] = 'Interface\\Icons\\Inv_Pet_Peacock_Gold',                -- Polymorph (Peacock)
     [161355] = 'Interface\\Icons\\Inv_Misc_PenguinPet',                 -- Polymorph (Penguin)
     [28272]  = 'Interface\\Icons\\Spell_Magic_PolymorphPig',            -- Polymorph (Pig)
