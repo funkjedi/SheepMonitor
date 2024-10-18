@@ -23,6 +23,7 @@ LibAuraInfo.auraInfo[161372]  = '60;1' -- updating polymorph value for BFA
 LibAuraInfo.auraInfo[383121]  = '60;1' -- adding mass polymorph
 LibAuraInfo.auraInfo[3355]    = '60;1' -- fixing incorrect value
 LibAuraInfo.auraInfo[115078]  = '40;1' -- adding ability_monk_paralysis
+LibAuraInfo.auraInfo[460392]  = '60;1' -- updating polymorph value for TWW
 -- LuaFormatter on
 
 function SheepMonitor:OnInitialize()
