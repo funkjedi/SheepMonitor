@@ -1,3 +1,7 @@
+1.31
+- added support for Polymorph: Mosswool
+- update IsAddOnLoaded calls
+
 1.30
 - updated for classic/cata
 
