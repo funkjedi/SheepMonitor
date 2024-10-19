@@ -1,7 +1,7 @@
 local addonName, SheepMonitor = ...
 
 function SheepMonitor:ShowQuartz(aura)
-    if aura and IsAddOnLoaded('Quartz') then
+    if aura and C_AddOns.IsAddOnLoaded('Quartz') then
         local Mirror = LibStub('AceAddon-3.0'):GetAddon('Quartz3'):GetModule('Mirror')
 
         Mirror.ExternalTimers[aura.destName .. ' (' .. aura.spellName .. ')'] = {
@@ -21,7 +21,7 @@ function SheepMonitor:ShowQuartz(aura)
 end
 
 function SheepMonitor:HideQuartz(aura)
-    if aura and IsAddOnLoaded('Quartz') then
+    if aura and C_AddOns.IsAddOnLoaded('Quartz') then
         local Mirror = LibStub('AceAddon-3.0'):GetAddon('Quartz3'):GetModule('Mirror')
 
         for k, v in pairs(Mirror.ExternalTimers) do
@@ -52,7 +52,7 @@ local function GetActionBarButtonFrame(id)
 end
 
 function SheepMonitor:ShowOmniCC(aura)
-    if aura and IsAddOnLoaded('OmniCC') then
+    if aura and C_AddOns.IsAddOnLoaded('OmniCC') then
         for i = 1, 120 do
             local spellId = select(2, GetActionInfo(i))
 
@@ -69,7 +69,7 @@ function SheepMonitor:ShowOmniCC(aura)
 end
 
 function SheepMonitor:HideOmniCC(aura)
-    if aura and IsAddOnLoaded('OmniCC') then
+    if aura and C_AddOns.IsAddOnLoaded('OmniCC') then
         for i = 1, 120 do
             local spellId = select(2, GetActionInfo(i))
 
