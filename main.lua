@@ -1,12 +1,12 @@
 local addonName, SheepMonitor = ...
 
-SheepMonitor                  = LibStub('AceAddon-3.0'):NewAddon(SheepMonitor, addonName, 'AceEvent-3.0', 'AceTimer-3.0')
+SheepMonitor = LibStub('AceAddon-3.0'):NewAddon(SheepMonitor, addonName, 'AceEvent-3.0', 'AceTimer-3.0')
 
-_G['SheepMonitor']            = SheepMonitor
+_G['SheepMonitor'] = SheepMonitor
 
-local L                       = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
+local L = LibStub('AceLocale-3.0'):GetLocale('SheepMonitor')
 
-local LibAuraInfo             = LibStub('LibAuraInfo-1.0')
+local LibAuraInfo = LibStub('LibAuraInfo-1.0')
 
 -- LuaFormatter off
 LibAuraInfo.auraInfo[118]     = '60;1' -- updating polymorph value for BFA
@@ -25,6 +25,18 @@ LibAuraInfo.auraInfo[3355]    = '60;1' -- fixing incorrect value
 LibAuraInfo.auraInfo[115078]  = '40;1' -- adding ability_monk_paralysis
 LibAuraInfo.auraInfo[460392]  = '60;1' -- updating polymorph value for TWW
 -- LuaFormatter on
+
+-- damage event types for CLEU break detection
+local damageEventTypes = {
+    ['SWING_DAMAGE'] = true,
+    ['RANGE_DAMAGE'] = true,
+    ['SPELL_DAMAGE'] = true,
+    ['SPELL_PERIODIC_DAMAGE'] = true,
+    ['SPELL_BUILDING_DAMAGE'] = true,
+    ['ENVIRONMENTAL_DAMAGE'] = true,
+    ['DAMAGE_SPLIT'] = true,
+    ['DAMAGE_SHIELD'] = true,
+}
 
 function SheepMonitor:OnInitialize()
     self.db = LibStub('AceDB-3.0'):New('SheepMonitorDatabase', {
@@ -73,69 +85,112 @@ function SheepMonitor:IsCata()
 end
 
 function SheepMonitor:OnEnable()
-    self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+    self:RegisterEvent('UNIT_AURA')
+
+    if self:IsClassic() then
+        self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+    end
+end
+
+function SheepMonitor:UNIT_AURA(event, unitTarget, updateInfo)
+    local destGUID = UnitGUID(unitTarget)
+
+    if updateInfo then
+        self:HandleUnitAuraRetail(unitTarget, destGUID, updateInfo)
+    else
+        self:HandleUnitAuraClassic(unitTarget, destGUID)
+    end
+end
+
+function SheepMonitor:HandleUnitAuraRetail(unitTarget, destGUID, updateInfo)
+    if updateInfo.addedAuras then
+        for _, aura in ipairs(updateInfo.addedAuras) do
+            if self.trackableAuras[aura.spellId] then
+                if aura.sourceUnit == 'player' or (self.db.char.monitorRaid and UnitInRaid(aura.sourceUnit)) then
+                    local sheepData = {
+                        auraGUID = aura.spellId .. destGUID,
+                        auraInstanceID = aura.auraInstanceID,
+                        sourceName = UnitName(aura.sourceUnit),
+                        destGUID = destGUID,
+                        destName = UnitName(unitTarget),
+                        spellId = aura.spellId,
+                        spellName = aura.name,
+                        texture = aura.icon,
+                        timestamp = GetTime(),
+                        duration = aura.duration,
+                        expirationTime = aura.expirationTime,
+                    }
+
+                    self:AuraApplied(sheepData)
+                end
+            end
+        end
+    end
+
+    if updateInfo.removedAuraInstanceIDs then
+        for _, instanceID in ipairs(updateInfo.removedAuraInstanceIDs) do
+            local index, aura = SheepMonitor:GetAuraByInstanceID(instanceID)
+            if index and aura then
+                self:AuraRemoved(aura.destGUID, aura.spellId)
+            end
+        end
+    end
+end
+
+function SheepMonitor:HandleUnitAuraClassic(unitTarget, destGUID)
+    for spellId, texture in pairs(self.trackableAuras) do
+        local auraData = SheepMonitor.GetUnitAuraBySpellID(unitTarget, spellId)
+
+        if auraData then
+            local sourceUnit = auraData.sourceUnit
+
+            if sourceUnit == 'player' or (self.db.char.monitorRaid and UnitInRaid(sourceUnit)) then
+                local existingIndex = self:UnitHasAura(destGUID, spellId)
+
+                if not existingIndex then
+                    local spellName, _, spellTexture = SheepMonitor.GetSpellInfo(spellId)
+                    local sheepData = {
+                        auraGUID = spellId .. destGUID,
+                        sourceName = sourceUnit and UnitName(sourceUnit) or UnitName('player'),
+                        destGUID = destGUID,
+                        destName = UnitName(unitTarget),
+                        spellId = spellId,
+                        spellName = auraData.name or spellName,
+                        texture = auraData.icon or spellTexture or texture,
+                        timestamp = GetTime(),
+                        duration = auraData.duration or LibAuraInfo:GetDuration(spellId),
+                        expirationTime = auraData.expirationTime,
+                    }
+
+                    self:AuraApplied(sheepData)
+                end
+            end
+        else
+            local existingIndex, existingAura = self:UnitHasAura(destGUID, spellId)
+
+            if existingIndex and existingAura then
+                self:AuraRemoved(destGUID, spellId)
+            end
+        end
+    end
 end
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
     local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2,
-    spellId, spellName, spellSchool = CombatLogGetCurrentEventInfo()
+        spellId, spellName, spellSchool = CombatLogGetCurrentEventInfo()
 
     -- the classic always returns a spell id of zero so we
     -- resolve the spell id using the spell name instead
-    if self:IsClassic() then
-        spellId = select(7, GetSpellInfo(spellName))
+    if spellName then
+        spellId = select(7, SheepMonitor.GetSpellInfo(spellName)) or spellId
     end
-
-    --	if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and sourceName == UnitName('player') then
-    --		ATOM:Dump({ spellId = spellId, spellName = spellName })
-    --	end
-
-    -- watch for polymorphed mobs
-    if (eventType == 'SPELL_AURA_APPLIED' or eventType == 'SPELL_AURA_REFRESH') and self.trackableAuras[spellId] then
-        if (self.db.char.monitorRaid and UnitInRaid(sourceName)) or sourceName == UnitName('player') then
-            local aura = {
-                auraGUID = spellId .. destGUID, -- a unique identifier for this aura occurance
-                sourceGUID = sourceGUID,
-                sourceName = sourceName,
-                destGUID = destGUID,
-                destName = destName,
-                spellId = spellId,
-                spellName = spellName,
-                texture = self.trackableAuras[spellId],
-                timestamp = GetTime(),
-                duration = LibAuraInfo:GetDuration(spellId, sourceGUID, destGUID),
-            }
-
-            if not self:IsClassic() and destGUID == UnitGUID('target') then
-                local auraInfo = AuraUtil.FindAuraByName(spellName, 'target', 'PLAYER|HARMFUL')
-                aura.duration = auraInfo and auraInfo.duration or aura.duration
-            end
-
-            self:AuraApplied(aura)
-        end
-    end
-
-    -- watch for damage on our polymorph and record whoever breaks
-    local damageEventTypes = {
-        ['SWING_DAMAGE'] = true,
-        ['RANGE_DAMAGE'] = true,
-        ['SPELL_DAMAGE'] = true,
-        ['SPELL_PERIODIC_DAMAGE'] = true,
-        ['SPELL_BUILDING_DAMAGE'] = true,
-        ['ENVIRONMENTAL_DAMAGE'] = true,
-        ['DAMAGE_SPLIT'] = true,
-        ['DAMAGE_SHIELD'] = true,
-    }
 
     if self.watchForBreakers and self.watchForBreakers > 0 and damageEventTypes[eventType] then
-        self:AuraBroken(destGUID, sourceName, eventType == 'SWING_DAMAGE' and 'Melee' or spellName)
+        self:AuraBroken(destGUID, sourceName, eventType == 'SWING_DAMAGE' and 'Melee' or (spellName or 'Unknown'))
     end
 
-    -- watch for our polymorph to dissipate
-    if eventType == 'SPELL_AURA_REMOVED' then
-        if self.trackableAuras[spellId] then
-            self:AuraRemoved(destGUID, spellId)
-        end
+    if eventType == 'SPELL_AURA_REMOVED' and self.trackableAuras[spellId] then
+        self:AuraRemoved(destGUID, spellId)
     end
 end
 
@@ -194,6 +249,12 @@ function SheepMonitor:POLYMORPH_REMOVED(aura)
 
     if self.db.char.enableQuartz then
         self:HideQuartz(aura)
+    end
+
+    -- only play sound and show messages if the aura was broken early
+    -- breakerName is set via CLEU (Classic), wasBroken is set via timer (Retail)
+    if not aura.breakerName and not aura.wasBroken then
+        return
     end
 
     if self.db.char.enableAudibleBreak then

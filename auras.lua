@@ -78,28 +78,78 @@ function SheepMonitor:AuraBroken(destGUID, breakerName, breakerReason)
     end
 end
 
+local function finalizeAuraRemoval(index, aura)
+    table.remove(SheepMonitor.auras, index)
+    SheepMonitor:POLYMORPH_REMOVED(aura)
+
+    if aura.timer then
+        aura.timer:Stop()
+    end
+
+    SheepMonitor:UpdateAuraTimers()
+end
+
 function SheepMonitor:AuraRemoved(destGUID, spellId)
     -- print('SheepMonitor:AuraRemoved', destGUID, spellId)
     local index, aura = self:UnitHasAura(destGUID, spellId)
 
-    if index then
-        -- we only need to watch damage in the combat logs during the brief moment the timer is up
-        -- the flag must be a counter as it's possible that multiple timers are up at once
+    if not index then
+        return
+    end
+
+    -- check if the aura was broken early by comparing remaining time
+    -- if there's more than 0.5 seconds remaining, it was broken (not expired naturally)
+    if aura.timer then
+        local remaining = aura.timer:GetRemaining(true)
+
+        if remaining > 0.5 then
+            aura.wasBroken = true
+        end
+    end
+
+    if SheepMonitor:IsClassic() then
         self.watchForBreakers = self.watchForBreakers and self.watchForBreakers + 1 or 1
 
-        -- delay removal of the aura so we can check who the breaker was
         self:ScheduleTimer(function()
             SheepMonitor.watchForBreakers = SheepMonitor.watchForBreakers - 1
-
-            table.remove(SheepMonitor.auras, index)
-            SheepMonitor:POLYMORPH_REMOVED(aura)
-
-            if aura.timer then
-                aura.timer:Stop()
-            end
-
-            SheepMonitor:UpdateAuraTimers()
+            finalizeAuraRemoval(index, aura)
         end, 0.1)
+    else
+        finalizeAuraRemoval(index, aura)
+    end
+end
+
+function SheepMonitor:GetAuraByInstanceID(instanceID)
+    for index, aura in ipairs(self.auras) do
+        if aura.auraInstanceID == instanceID then
+            return index, aura
+        end
+    end
+
+    return nil, nil
+end
+
+if C_Spell and C_Spell.GetSpellInfo then
+    SheepMonitor.GetSpellInfo = function(spellID)
+        local info = C_Spell.GetSpellInfo(spellID)
+        if info then
+            return info.name, nil, info.iconID, info.castTime, info.minRange, info.maxRange, info.spellID
+        end
+    end
+else
+    SheepMonitor.GetSpellInfo = _G.GetSpellInfo
+end
+
+SheepMonitor.GetUnitAuraBySpellID = function(unit, spellID)
+    if C_UnitAuras and C_UnitAuras.GetAuraDataBySpellID then
+        return C_UnitAuras.GetAuraDataBySpellID(unit, spellID)
+    end
+
+    for i = 1, 40 do
+        local name, icon, _, _, duration, expirationTime, unitCaster, _, _, sID = UnitAura(unit, i, 'HARMFUL')
+        if sID == spellID then
+            return { name = name, icon = icon, duration = duration, expirationTime = expirationTime, sourceUnit = unitCaster }
+        end
     end
 end
 
