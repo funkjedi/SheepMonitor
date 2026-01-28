@@ -105,15 +105,18 @@ end
 function SheepMonitor:HandleUnitAuraRetail(unitTarget, destGUID, updateInfo)
     if updateInfo.addedAuras then
         for _, aura in ipairs(updateInfo.addedAuras) do
-            if self.trackableAuras[aura.spellId] then
+            local spellId = aura.spellId
+
+            -- guard against secret spellIds that can't be used as table keys
+            if spellId and type(spellId) == 'number' and self.trackableAuras[spellId] then
                 if aura.sourceUnit == 'player' or (self.db.char.monitorRaid and UnitInRaid(aura.sourceUnit)) then
                     local sheepData = {
-                        auraGUID = aura.spellId .. destGUID,
+                        auraGUID = spellId .. destGUID,
                         auraInstanceID = aura.auraInstanceID,
                         sourceName = UnitName(aura.sourceUnit),
                         destGUID = destGUID,
                         destName = UnitName(unitTarget),
-                        spellId = aura.spellId,
+                        spellId = spellId,
                         spellName = aura.name,
                         texture = aura.icon,
                         timestamp = GetTime(),

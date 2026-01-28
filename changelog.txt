@@ -1,5 +1,6 @@
 1.33
 - fixes for classic CLEU errors
+- guard against secret spellIds
 
 1.32
 - updated for patch 12.0
