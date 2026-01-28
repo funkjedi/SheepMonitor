@@ -38,6 +38,10 @@ local damageEventTypes = {
     ['DAMAGE_SHIELD'] = true,
 }
 
+local issecretvalue = issecretvalue or function()
+    return false
+end
+
 function SheepMonitor:OnInitialize()
     self.db = LibStub('AceDB-3.0'):New('SheepMonitorDatabase', {
         char = {
@@ -108,7 +112,7 @@ function SheepMonitor:HandleUnitAuraRetail(unitTarget, destGUID, updateInfo)
             local spellId = aura.spellId
 
             -- guard against secret spellIds that can't be used as table keys
-            if spellId and type(spellId) == 'number' and self.trackableAuras[spellId] then
+            if not issecretvalue(spellId) and self.trackableAuras[spellId] then
                 if aura.sourceUnit == 'player' or (self.db.char.monitorRaid and UnitInRaid(aura.sourceUnit)) then
                     local sheepData = {
                         auraGUID = spellId .. destGUID,
@@ -126,6 +130,16 @@ function SheepMonitor:HandleUnitAuraRetail(unitTarget, destGUID, updateInfo)
 
                     self:AuraApplied(sheepData)
                 end
+            end
+        end
+    end
+
+    if updateInfo.updatedAuraInstanceIDs then
+        for _, instanceID in ipairs(updateInfo.updatedAuraInstanceIDs) do
+            local updatedAuraData = C_UnitAuras.GetAuraDataByAuraInstanceID(unitTarget, instanceID)
+
+            if updatedAuraData then
+                self:AuraUpdated(instanceID, updatedAuraData)
             end
         end
     end

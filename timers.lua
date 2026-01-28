@@ -55,9 +55,6 @@ local function createAuraTimer()
     local frameName = 'SheepMonitorTimer' .. (#timerInstances + 1)
     local timer = CreateFrame('Frame', frameName, createNotifierFrame(), 'SheepMonitorTimerTemplate')
 
-    timer.StatusBar.Label:SetFont([[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]], 11)
-    timer.StatusBar.Countdown:SetFont([[Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf]], 13)
-
     table.insert(timerInstances, timer)
 
     return timer, #timerInstances
@@ -111,6 +108,10 @@ function SheepMonitorTimerMixin:Stop()
 end
 
 function SheepMonitorTimerMixin:GetRemaining(raw)
+    if not self.aura then
+        return 0
+    end
+
     local remaining = self.aura.duration - (GetTime() - self.aura.timestamp)
     return raw and remaining or floor(remaining)
 end

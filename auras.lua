@@ -68,6 +68,25 @@ function SheepMonitor:AuraApplied(aura)
     aura.timer = SheepMonitor:StartAuraTimer(aura)
 end
 
+function SheepMonitor:AuraUpdated(instanceID, updatedAuraData)
+    -- print('SheepMonitor:AuraUpdated', instanceID)
+    local index, aura = self:GetAuraByInstanceID(instanceID)
+
+    if not index or not aura then
+        return
+    end
+
+    aura.timestamp = GetTime()
+    aura.duration = updatedAuraData.duration
+    aura.expirationTime = updatedAuraData.expirationTime
+
+    if aura.timer then
+        aura.timer:Stop()
+    end
+
+    aura.timer = SheepMonitor:StartAuraTimer(aura)
+end
+
 function SheepMonitor:AuraBroken(destGUID, breakerName, breakerReason)
     -- print('SheepMonitor:AuraBroken', destGUID, breakerName, breakerReason)
     for index, aura in ipairs(self.auras) do

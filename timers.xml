@@ -3,6 +3,13 @@
 
   <Script file="timers.lua"/>
 
+  <Font name="SheepMonitorFont11" font="Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf" virtual="true">
+    <FontHeight val="11"/>
+  </Font>
+  <Font name="SheepMonitorFont13" font="Interface\AddOns\SheepMonitor\fonts\DroidSans.ttf" virtual="true">
+    <FontHeight val="13"/>
+  </Font>
+
   <Frame name="SheepMonitorTimerTemplate" inherits="BackdropTemplate" mixin="SheepMonitorTimerMixin" virtual="true" enableMouse="true" hidden="true">
     <Size x="140" y="28"/>
     <Anchors>
@@ -35,7 +42,7 @@
         </Anchors>
         <Layers>
           <Layer level="ARTWORK">
-            <FontString parentKey="Label" inherits="GameFontHighlightSmall" justifyH="LEFT" wordwrap="true">
+            <FontString parentKey="Label" inherits="SheepMonitorFont11" justifyH="LEFT" wordwrap="true">
               <Anchors>
                 <Anchor point="TOP"/>
                 <Anchor point="BOTTOM"/>
@@ -43,16 +50,14 @@
                 <Anchor point="RIGHT" x="-26" y="0"/>
               </Anchors>
               <Color r="1.0" g="1.0" b="1.0"/>
-              <FontHeight val="11"/>
             </FontString>
-            <FontString parentKey="Countdown" inherits="GameFontNormal">
+            <FontString parentKey="Countdown" inherits="SheepMonitorFont13">
               <Anchors>
                 <Anchor point="TOP"/>
                 <Anchor point="BOTTOM"/>
                 <Anchor point="RIGHT" x="-4" y="0"/>
               </Anchors>
               <Color r="1.0" g="0.82" b="0"/>
-              <FontHeight val="13"/>
             </FontString>
           </Layer>
         </Layers>
