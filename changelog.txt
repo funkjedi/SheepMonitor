@@ -1,3 +1,6 @@
+1.33
+- fixes for classic CLEU errors
+
 1.32
 - updated for patch 12.0
 - replace CLEU with UNIT_AURA events
