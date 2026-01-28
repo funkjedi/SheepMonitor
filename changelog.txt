@@ -1,3 +1,6 @@
+1.34
+- performance improvements for classic
+
 1.33
 - fixes for classic CLEU errors
 - guard against secret spellIds

@@ -193,8 +193,8 @@ function SheepMonitor:HandleUnitAuraClassic(unitTarget, destGUID)
 end
 
 function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
-    local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2 =
-        CombatLogGetCurrentEventInfo()
+    local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2,
+        spellId, spellName = CombatLogGetCurrentEventInfo()
 
     local isDamageEvent = damageEventTypes[eventType]
     local isAuraRemoved = eventType == 'SPELL_AURA_REMOVED'
@@ -207,19 +207,18 @@ function SheepMonitor:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
         if eventType == 'SWING_DAMAGE' then
             self:AuraBroken(destGUID, sourceName, 'Melee')
         else
-            local spellId, spellName = select(12, CombatLogGetCurrentEventInfo())
             self:AuraBroken(destGUID, sourceName, spellName or 'Unknown')
         end
     end
 
     if isAuraRemoved then
-        local spellId, spellName = select(12, CombatLogGetCurrentEventInfo())
+        local _
 
-        -- classic always returns a spell id of zero so we
-        -- resolve the spell id using the spell name instead
-        if spellName then
-            spellId = select(7, SheepMonitor.GetSpellInfo(spellName)) or spellId
+        if spellId < 1 and spellName then
+            _, _, _, _, _, _, spellId = SheepMonitor.GetSpellInfo(spellName)
         end
+
+        spellId = spellId or 0
 
         if self.trackableAuras[spellId] then
             self:AuraRemoved(destGUID, spellId)
