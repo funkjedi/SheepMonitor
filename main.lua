@@ -99,6 +99,10 @@ end
 function SheepMonitor:UNIT_AURA(event, unitTarget, updateInfo)
     local destGUID = UnitGUID(unitTarget)
 
+    if not destGUID or issecretvalue(destGUID) then
+        return
+    end
+
     if updateInfo then
         self:HandleUnitAuraRetail(unitTarget, destGUID, updateInfo)
     else
