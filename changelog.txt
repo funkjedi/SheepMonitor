@@ -1,3 +1,6 @@
+1.36
+- guard against secret cooldown values
+
 1.35
 - guard against secret destGUID values
 

@@ -20,6 +20,10 @@ if not string.match(GetLocale(), '^en') then
     SHEEPMONITOR_TEXT_FONT = STANDARD_TEXT_FONT
 end
 
+local issecretvalue = issecretvalue or function()
+    return false
+end
+
 local function createNotifierFrame()
     if notifierFrame then
         return notifierFrame
@@ -108,7 +112,7 @@ function SheepMonitorTimerMixin:Stop()
 end
 
 function SheepMonitorTimerMixin:GetRemaining(raw)
-    if not self.aura then
+    if not self.aura or issecretvalue(self.aura.duration) then
         return 0
     end
 
